@@ -8,20 +8,18 @@
  *   Month-wise : month progression table (when the office-PC script sends it).
  *   History    : one snapshot per state per day (for trend / Bihar tracking).
  *
- * Data sources (in order of preference):
- *   1. Office PC in India runs pmsg_portal_scraper.py → reads pmsuryaghar.gov.in
- *      → POSTs here (doPost). This is the OFFICIAL portal data.
- *   2. If no PC push in the last 20 hours, the daily trigger reads the public
- *      daily copy at solentra.in (unofficial mirror of the portal).
- *      (Apps Script cannot read pmsuryaghar.gov.in directly – it blocks non-Indian servers.)
+ * Data source (fully online, no PC needed):
+ *   Twice a day the script reads the public daily copy of the National Portal
+ *   (solentra.in – unofficial). Apps Script cannot read pmsuryaghar.gov.in itself
+ *   because the portal blocks servers outside India.
+ *   If the copy site fails or changes, the last good figures stay in the sheet.
+ *   (Optional: an office PC can push official portal data via doPost – see README.)
  *
  * SETUP (once):
  *   1. In the sheet: Extensions → Apps Script → delete any code → paste this file → Save.
- *   2. Change CFG.TOKEN below to your own secret word (same word goes in the Python script).
- *   3. Run  installDailyTrigger  once (Run ▶) and allow permissions.
- *   4. Deploy → New deployment → type "Web app" → Execute as: Me,
- *      Who has access: Anyone → Deploy → copy the Web app URL into the Python script.
- *   5. Reload the sheet: a menu "PMSG Update" appears (Update now / Install daily trigger).
+ *   2. Choose  installDailyTrigger  in the function list → Run ▶ → allow permissions.
+ *      This fills the State-wise tab immediately and sets the 9 AM / 6 PM updates.
+ *   3. Reload the sheet: a menu "PMSG Update" appears (Update now / Install daily auto-update).
  */
 
 const CFG = {
@@ -31,7 +29,7 @@ const CFG = {
   SHEET_HISTORY: 'History',
   MIRROR_URL: 'https://solentra.in/solar-dashboard.html',
   TZ: 'Asia/Kolkata',
-  DAILY_HOUR: 10,          // 10 AM IST daily fallback run
+  RUN_HOURS: [9, 18],      // checks at 9 AM and 6 PM IST every day
   HIGHLIGHT_STATE: 'bihar'
 };
 
@@ -67,15 +65,17 @@ function installDailyTrigger() {
   ScriptApp.getProjectTriggers()
     .filter(t => t.getHandlerFunction() === 'dailyJob')
     .forEach(t => ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger('dailyJob').timeBased().everyDays(1)
-    .atHour(CFG.DAILY_HOUR).inTimezone(CFG.TZ).create();
-  toast_('Daily auto-update installed (around ' + CFG.DAILY_HOUR + ':00 IST).');
+  CFG.RUN_HOURS.forEach(h => ScriptApp.newTrigger('dailyJob').timeBased().everyDays(1)
+    .atHour(h).inTimezone(CFG.TZ).create());
+  toast_('Auto-update installed: every day around ' + CFG.RUN_HOURS.map(h => h + ':00').join(' and ') + ' IST.');
+  updateFromMirror();                                     // fill the State-wise tab straight away
 }
 
 function dailyJob() {
   const last = Number(PropertiesService.getScriptProperties().getProperty('lastPortalPush') || 0);
-  if (Date.now() - last < 20 * 3600 * 1000) return;      // office PC already sent official data
-  updateFromMirror();
+  if (Date.now() - last < 8 * 3600 * 1000) return;       // office PC sent official data recently
+  try { updateFromMirror(); }
+  catch (e) { Logger.log('Update skipped, last good figures kept: ' + e); }  // keep last good data
 }
 
 /* ============================ SOURCE 1: OFFICE PC ============================ */

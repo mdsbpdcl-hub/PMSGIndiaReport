@@ -4,9 +4,12 @@ name: Daily PM Surya Ghar update
 # only answers Indian internet connections. No pull_request trigger, so
 # nobody else can run code on that PC.
 on:
-  schedule:
-    - cron: "41 3 * * *"     # 09:11 IST every day
-  workflow_dispatch:          # "Run workflow" button
+  # Daily schedule switched OFF: the sheet now updates itself online (Option 1).
+  # To use an office PC for official portal data, register it as a runner and
+  # remove the "#" from the two lines below.
+  # schedule:
+  #   - cron: "41 3 * * *"   # 09:11 IST every day
+  workflow_dispatch:          # "Run workflow" button (manual only)
 
 concurrency:
   group: pmsg-daily
