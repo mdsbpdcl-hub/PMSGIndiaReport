@@ -4,7 +4,7 @@ Daily state-wise progress of **PM Surya Ghar: Muft Bijli Yojana**, with Bihar's 
 
 | Part | File | What it does |
 |---|---|---|
-| Dashboard | `index.html` | Bihar's rank, installations, ranking table, ranking among free-power states, automatic findings, day-by-day trend. Reads the live figures from the "PMSG-MBY All States" sheet. |
+| Dashboard | `index.html` (+ `vendor/` PDF library) | Export PDF of free-electricity states and all states. Bihar's rank, installations, ranking table, ranking among free-power states, automatic findings, day-by-day trend. Reads the live figures from the "PMSG-MBY All States" sheet. |
 | Portal reader | `scraper/pmsg_portal_scraper.py` | Opens pmsuryaghar.gov.in (State/UT-wise + Month-wise), saves Excel/CSV and pushes the figures to the sheet. |
 | One-off copy | `scraper/pmsg_portal_console.js` | Paste in the browser console on the portal page → downloads a CSV. |
 | Sheet updater | `apps-script/PMSG_Sheet_AutoUpdate.gs` | Sorts by installations, ranks, adds free-power column, totals, change since last update, History tab. Backup daily update if no PC push. |
