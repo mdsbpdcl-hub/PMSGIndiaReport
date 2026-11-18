@@ -244,6 +244,33 @@ th .ar{color:var(--hi)}
 .fnote{margin-top:14px;font-size:12.5px;color:#7a4b12;background:#fff8ec;border:1px solid #fbe3bd;border-left:4px solid #e3a21a;border-radius:10px;padding:10px 12px}
 .insw{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}
 @media(max-width:820px){.insw{grid-template-columns:minmax(0,1fr)}}
+
+/* force update modal */
+.mscrim{position:fixed;inset:0;background:rgba(16,24,40,.35);z-index:70;display:none;align-items:center;justify-content:center;padding:16px}
+.mscrim.on{display:flex}
+.modal{background:#fff;border-radius:16px;width:min(560px,100%);max-height:92vh;overflow:auto;box-shadow:0 24px 60px -20px rgba(16,24,40,.45)}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.mh h3{margin:0;font-size:16px}
+.mb{padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px}
+.fl{font-size:12.5px;font-weight:600;color:var(--muted)}
+.pwrow{display:flex;gap:8px;margin-top:-6px}
+.pwrow input{flex:1;min-width:0;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font:inherit}
+.opt{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.on1{flex:1 1 260px;min-width:0}
+.ot{font-weight:650;font-size:14px}
+.od{font-size:12.5px;color:var(--muted);margin-top:2px}
+.btnp,.btns{border-radius:8px;padding:8px 14px;font-weight:600;font-size:13.5px;cursor:pointer;white-space:nowrap}
+.btnp{border:1px solid var(--hi);background:var(--hi);color:#fff}
+.btns{border:1px solid var(--ink);background:#fff;color:var(--ink)}
+.btnp:disabled,.btns:disabled{opacity:.5;cursor:wait}
+.steps{display:flex;flex-direction:column;gap:8px;background:#f9fafb;border:1px solid var(--line);border-radius:12px;padding:12px}
+.st{font-size:12.5px;color:#344054;display:flex;flex-direction:column;gap:5px}
+.cr{display:flex;gap:6px;align-items:center;min-width:0}
+.cr code{flex:1;min-width:0;display:block;background:#fff;border:1px solid var(--line);border-radius:6px;padding:6px 8px;font-size:11.5px;overflow-x:auto;white-space:nowrap}
+.cp{border:1px solid var(--line);background:#fff;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer;flex:none}
+.fmsg{font-size:13px;min-height:18px}
+.fmsg.ok{color:var(--g)} .fmsg.err{color:var(--r)} .fmsg.wait{color:var(--muted)}
+#force svg{width:15px;height:15px}
 @media(max-width:640px){#fseg{display:none}}
 @media(max-width:600px){.strip .tl.odd{display:none}.tile .fz{display:none}.tmap{gap:3px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -258,6 +285,7 @@ th .ar{color:var(--hi)}
       <button class="on" data-scope="all">All states</button>
       <button data-scope="free">Free power states</button>
     </div>
+    <button class="refresh" id="force" title="Force update"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Force update</span></button>
     <button class="refresh" id="refresh" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Refresh</span></button>
   </div>
 </header>
@@ -269,12 +297,36 @@ th .ar{color:var(--hi)}
 <div class="scrim" id="scrim"></div>
 <aside class="drawer" id="drawer" aria-hidden="true"></aside>
 <div class="tip" id="tip"></div>
+<div class="mscrim" id="fm" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="fmT">
+    <div class="mh"><h3 id="fmT">Force update</h3><button class="ib" id="fmX" aria-label="Close">✕</button></div>
+    <div class="mb">
+      <label class="fl" for="fpw">Password</label>
+      <div class="pwrow"><input id="fpw" type="password" autocomplete="current-password" placeholder="Enter password"><button class="ib" id="fpwS" type="button" title="Show password" aria-label="Show password">👁</button></div>
+      <div class="opt">
+        <div class="on1"><div class="ot">Update now – online</div><div class="od">Gets today's figures from the daily copy of the portal. Takes about 20 seconds. Nothing to install.</div></div>
+        <button class="btnp" id="fGo">Update now</button>
+      </div>
+      <div class="opt">
+        <div class="on1"><div class="ot">Update from the official portal – on your computer</div><div class="od">Downloads a small program. Run it on a computer with an Indian internet connection; it reads pmsuryaghar.gov.in and updates the figures here.</div></div>
+        <button class="btns" id="fDl">Download program</button>
+      </div>
+      <div class="steps" id="fSteps" hidden>
+        <div class="st"><div class="sl"><b>1.</b> First time only – open Command Prompt and run:</div><div class="cr"><code id="c1">pip install playwright pandas openpyxl &amp;&amp; python -m playwright install chromium</code><button class="cp" data-c="c1">Copy</button></div></div>
+        <div class="st"><div class="sl"><b>2.</b> Run the program from your Downloads folder:</div><div class="cr"><code id="c2">cd %USERPROFILE%\Downloads &amp;&amp; python pmsg_update.py</code><button class="cp" data-c="c2">Copy</button></div></div>
+        <div class="st"><div class="sl"><b>3.</b> A browser window opens and closes by itself. When the program shows <i>"ok": true</i>, press <b>Refresh</b> on this page.</div></div>
+      </div>
+      <div class="fmsg" id="fMsg" role="status"></div>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ============================ settings ============================ */
 const DATA_ID = '1xS31h5YeGGoqLS5cg82zZh6ZO7HCB2sBoKZUnrhzr9o';
 const HOME = 'bihar';
 const APP = 'pmsg-india';
+const WEBAPP_URL = '';   // optional: update-service link; if empty it is read from the data
 
 /* Last known figures (used only if the live figures cannot be reached) */
 const SNAPSHOT = {asOn:'18 Nov 2026', rows:
@@ -323,6 +375,7 @@ function build(rows){
   if(I.state<0||I.inst<0) throw new Error('cols');
   let asOn=null; const lu=h.findIndex(x=>x.startsWith('last updated'));
   if(lu>=0&&rows[0][lu+1]) asOn=String(rows[0][lu+1]).replace(/\s*IST$/,'');
+  let updateLink=''; rows.forEach(r=>{const i=r.findIndex(c=>String(c).trim().toLowerCase()==='update link'); if(i>=0&&r[i+1]) updateLink=String(r[i+1]).trim();});
   const list=rows.slice(1).map(r=>{
     const o={state:String(r[I.state]||'').trim(),freeTxt:I.free>=0?String(r[I.free]||''):'',apps:num(r[I.apps]),inst:num(r[I.inst]),
       mw:I.mw>=0?num(r[I.mw]):null,cr:I.cr>=0?num(r[I.cr]):null,add:I.add>=0?num(r[I.add]):null};
@@ -332,7 +385,7 @@ function build(rows){
   const fr=list.filter(o=>o.cat==='free'); fr.forEach((o,i)=>o.frank=i+1);
   const T={apps:0,inst:0,mw:0,cr:0,add:0}; list.forEach(o=>{T.apps+=o.apps||0;T.inst+=o.inst;T.mw+=o.mw||0;T.cr+=o.cr||0;T.add+=o.add||0;});
   T.conv=T.inst/T.apps*100; T.kw=T.mw*1000/T.inst;
-  return {list,T,fr,asOn};
+  return {list,T,fr,asOn,updateLink};
 }
 
 async function load(){
@@ -707,6 +760,45 @@ function countUp(){ document.querySelectorAll('[data-count]').forEach(el=>{const
   const t0=performance.now(); const step=t=>{const p=Math.min(1,(t-t0)/1100); el.textContent=fmt(to*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step);}; requestAnimationFrame(step);}); }
 
 document.querySelectorAll('.pills button').forEach(b=>b.onclick=()=>{ scope=b.dataset.scope; document.querySelectorAll('.pills button').forEach(x=>x.classList.toggle('on',x===b)); band='all'; if(S){ drawTop(); drawBands(); drawTable(); setTimeout(()=>document.querySelectorAll('#topbars [data-w]').forEach(e=>e.style.width=e.dataset.w),30);} });
+
+/* ============================ force update ============================ */
+const fm=$('#fm'), fMsg=$('#fMsg');
+const link=()=>WEBAPP_URL||(S&&S.updateLink)||'';
+function say(t,c){fMsg.textContent=t; fMsg.className='fmsg '+(c||'');}
+function openForce(){ fm.classList.add('on'); fm.setAttribute('aria-hidden','false'); say(''); $('#fSteps').hidden=true; setTimeout(()=>$('#fpw').focus(),30);
+  if(!link()) say('The update service is not connected yet. Finish setup step 5 in the guide, then try again.','err'); }
+function closeForce(){ fm.classList.remove('on'); fm.setAttribute('aria-hidden','true'); }
+$('#force').onclick=openForce; $('#fmX').onclick=closeForce; fm.onclick=e=>{ if(e.target===fm) closeForce(); };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&fm.classList.contains('on')) closeForce(); });
+$('#fpwS').onclick=()=>{const i=$('#fpw'); i.type=i.type==='password'?'text':'password';};
+const ERR={password:'Wrong password.',locked:'Too many wrong tries. Please wait 10 minutes.',wait:'Updated a moment ago. Please wait 2 minutes before trying again.',busy:'Another update is running. Try again in a minute.',failed:'The update could not finish. The last figures are still shown. Try again later.'};
+async function call(body){
+  const r=await fetch(link(),{method:'POST',body:JSON.stringify(body)});   // plain text body: no pre-check request
+  return r.json();
+}
+function getPw(){ const p=$('#fpw').value.trim(); if(!p){ say('Please enter the password.','err'); $('#fpw').focus(); } return p; }
+$('#fGo').onclick=async()=>{
+  const pw=getPw(); if(!pw||!link()) return; const b=$('#fGo'); b.disabled=true; say('Updating… this takes about 20 seconds.','wait');
+  try{ const j=await call({token:pw,action:'force'});
+    if(j.ok){ say(`Done – ${j.states} states updated (${j.updated}). Loading the new figures…`,'ok'); setTimeout(()=>{closeForce(); load();},1200); }
+    else say(ERR[j.error]||ERR.failed,'err');
+  }catch(e){ say('Could not reach the update service. Check the connection and try again.','err'); }
+  b.disabled=false;
+};
+$('#fDl').onclick=async()=>{
+  const pw=getPw(); if(!pw||!link()) return; const b=$('#fDl'); b.disabled=true; say('Checking password…','wait');
+  try{ const j=await call({token:pw,action:'check'}); if(!j.ok){ say(ERR[j.error]||ERR.failed,'err'); b.disabled=false; return; }
+    const r=await fetch('scraper/pmsg_portal_scraper.py',{cache:'no-store'}); if(!r.ok) throw new Error('file');
+    let py=await r.text(); const q=v=>v.replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+    py=py.replace(/SHEET_WEBAPP_URL = os\.environ\.get\("SHEET_WEBAPP_URL", ""\)/,`SHEET_WEBAPP_URL = os.environ.get("SHEET_WEBAPP_URL", "${q(link())}")`)
+         .replace(/SHEET_TOKEN = os\.environ\.get\("SHEET_TOKEN", ""\)/,`SHEET_TOKEN = os.environ.get("SHEET_TOKEN", "${q(pw)}")`);
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([py],{type:'text/x-python'})); a.download='pmsg_update.py'; document.body.appendChild(a); a.click(); a.remove();
+    $('#fSteps').hidden=false; say('Program downloaded as pmsg_update.py. Follow the steps below.','ok');
+  }catch(e){ say('Could not prepare the program. Try again.','err'); }
+  b.disabled=false;
+};
+document.querySelectorAll('.cp').forEach(c=>c.onclick=async()=>{ const t=$('#'+c.dataset.c).textContent; try{ await navigator.clipboard.writeText(t); c.textContent='Copied'; setTimeout(()=>c.textContent='Copy',1500);}catch(e){} });
+
 $('#refresh').onclick=load;
 load();
 </script>

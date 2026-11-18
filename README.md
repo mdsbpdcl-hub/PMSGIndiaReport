@@ -26,7 +26,11 @@ The portal itself cannot be read from Google or GitHub servers (it blocks server
 4. **Dashboard online**: this repository → **Settings → Pages → Deploy from a branch → `main` / root → Save**.
    Dashboard: `https://mdsbpdcl-hub.github.io/PMSGIndiaReport/`
 
-Manual refresh any time: in the sheet, **PMSG Update → Update now (daily copy site)**.
+5. **Force update button on the dashboard** – in Apps Script set `TOKEN` (line near the top) to your password, then **Deploy → New deployment → Select type: Web app → Execute as: Me, Who has access: Anyone → Deploy**, and **open the Web app link once** (it saves the link for the dashboard).
+   Keep the password only in Apps Script – never commit it to this repository.
+
+Manual refresh any time: dashboard **Force update** (password) → *Update now*, or in the sheet **PMSG Update → Update now**.
+Official portal data any time: dashboard **Force update** → *Download program* → run it on a computer in India.
 
 ## Optional: official portal data from an office PC
 The Python reader (`scraper/`) can run on a PC in India and push the official portal figures to the sheet. Deploy the Apps Script as a **Web app** (Execute as: Me, Access: Anyone), set `TOKEN`, add GitHub secrets `SHEET_WEBAPP_URL` and `SHEET_TOKEN`, register the PC as a **self-hosted runner** (Settings → Actions → Runners), and switch on the schedule in `.github/workflows/daily-update.yml`.

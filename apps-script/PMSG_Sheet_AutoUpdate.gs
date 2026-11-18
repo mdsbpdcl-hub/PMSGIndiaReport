@@ -20,10 +20,16 @@
  *   2. Choose  installDailyTrigger  in the function list → Run ▶ → allow permissions.
  *      This fills the State-wise tab immediately and sets the 9 AM / 6 PM updates.
  *   3. Reload the sheet: a menu "PMSG Update" appears (Update now / Install daily auto-update).
+ *
+ * DASHBOARD "FORCE UPDATE" BUTTON (once):
+ *   4. Set CFG.TOKEN below to your password (keep it only here – not in GitHub).
+ *   5. Deploy → New deployment → Select type: Web app → Execute as: Me,
+ *      Who has access: Anyone → Deploy → open the Web app link once.
+ *      That saves the link; the dashboard button then works.
  */
 
 const CFG = {
-  TOKEN: 'CHANGE-ME-sbpdcl-2026',
+  TOKEN: 'CHANGE-ME',      // ← your password for the dashboard "Force update" button
   SHEET_STATE: 'State-wise',
   SHEET_MONTH: 'Month-wise',
   SHEET_HISTORY: 'History',
@@ -78,25 +84,65 @@ function dailyJob() {
   catch (e) { Logger.log('Update skipped, last good figures kept: ' + e); }  // keep last good data
 }
 
-/* ============================ SOURCE 1: OFFICE PC ============================ */
-
+/* ============================ WEB REQUESTS (dashboard + office PC) ============================ */
+/* The dashboard "Force update" button and the Python program call this.
+ * Every request must carry the password (CFG.TOKEN). 5 wrong tries lock it for 10 minutes. */
 function doPost(e) {
+  const lock = LockService.getScriptLock();
   try {
-    const body = JSON.parse(e.postData.contents);
-    if (body.token !== CFG.TOKEN) return json_({ ok: false, error: 'wrong token' });
+    const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    const cache = CacheService.getScriptCache();
+    const bad = Number(cache.get('badTries') || 0);
+    if (bad >= 5) return json_({ ok: false, error: 'locked' });
+    if (body.token !== CFG.TOKEN) { cache.put('badTries', String(bad + 1), 600); return json_({ ok: false, error: 'password' }); }
+    rememberUrl_();
+
+    if (body.action === 'check') return json_({ ok: true });
+
+    if (body.action === 'force') {                         // dashboard: update now from the daily copy
+      if (cache.get('recentForce')) return json_({ ok: false, error: 'wait' });
+      if (!lock.tryLock(30000)) return json_({ ok: false, error: 'busy' });
+      const n = updateFromMirror();
+      cache.put('recentForce', '1', 120);
+      return json_({ ok: true, states: n, updated: Utilities.formatDate(new Date(), CFG.TZ, 'dd MMM yyyy, HH:mm') });
+    }
+
+    // office PC / Python program: official portal rows
+    if (!lock.tryLock(30000)) return json_({ ok: false, error: 'busy' });
     const out = { ok: true };
     if (body.state && body.state.length > 1) {
-      out.state = writeState_(normaliseRows_(body.state), 'National Portal (pmsuryaghar.gov.in) – office PC');
+      out.state = writeState_(normaliseRows_(body.state), 'National Portal (pmsuryaghar.gov.in) – official');
       PropertiesService.getScriptProperties().setProperty('lastPortalPush', String(Date.now()));
     }
     if (body.month && body.month.length > 1) out.month = writeMonth_(body.month);
     return json_(out);
   } catch (err) {
-    return json_({ ok: false, error: String(err) });
+    Logger.log(err);
+    return json_({ ok: false, error: 'failed' });
+  } finally {
+    try { lock.releaseLock(); } catch (e) {}
   }
 }
 
-function doGet() { return json_({ ok: true, msg: 'PMSG sheet updater is running' }); }
+/* Open the web-app link once after deploying: it saves the link so the dashboard can find it. */
+function doGet() {
+  const u = rememberUrl_();
+  return HtmlService.createHtmlOutput('<p style="font:16px sans-serif">PMSG update service is running.' +
+    (u ? ' Update link saved – the dashboard button is now connected.' : '') + '</p>');
+}
+
+function rememberUrl_() {
+  try {
+    const u = ScriptApp.getService().getUrl();
+    if (u && /\/exec$/.test(u)) {
+      PropertiesService.getScriptProperties().setProperty('webAppUrl', u);
+      const sh = SpreadsheetApp.getActive().getSheetByName(CFG.SHEET_STATE);
+      if (sh) sh.getRange(4, 12, 1, 2).setValues([['Update link', u]]);
+      return u;
+    }
+  } catch (e) {}
+  return '';
+}
 
 /* ============================ SOURCE 2: DAILY COPY SITE ============================ */
 
@@ -107,6 +153,7 @@ function updateFromMirror() {
   if (rows.length < 5) throw new Error('No state table found on the copy site.');
   const n = writeState_(normaliseRows_(rows), 'solentra.in daily copy of National Portal (unofficial)');
   toast_('Updated ' + n + ' states.');
+  return n;
 }
 
 /* ============================ PARSING (pure functions) ============================ */
@@ -223,7 +270,9 @@ function writeState_(list, source) {
     ['Source', source],
     ['Sorted by', 'Installations (high to low)']
   ]);
-  sh.getRange(1, 12, 3, 1).setFontWeight('bold');
+  const link = PropertiesService.getScriptProperties().getProperty('webAppUrl');
+  if (link) sh.getRange(4, 12, 1, 2).setValues([['Update link', link]]);
+  sh.getRange(1, 12, 4, 1).setFontWeight('bold');
   sh.setColumnWidth(2, 230); sh.setColumnWidth(3, 330); sh.setColumnWidth(13, 330);
   sh.setColumnWidths(4, 7, 110);
 
