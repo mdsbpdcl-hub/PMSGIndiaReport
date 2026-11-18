@@ -241,7 +241,6 @@ th .ar{color:var(--hi)}
 .fc .cbar{grid-column:1/-1;position:relative;height:7px;background:var(--track);border-radius:4px}
 .fc .cbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
 .fc .cbar s{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ref)}
-.fnote{margin-top:14px;font-size:12.5px;color:#7a4b12;background:#fff8ec;border:1px solid #fbe3bd;border-left:4px solid #e3a21a;border-radius:10px;padding:10px 12px}
 .insw{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}
 @media(max-width:820px){.insw{grid-template-columns:minmax(0,1fr)}}
 
@@ -478,7 +477,6 @@ function render(){
       <div class="fbtns"><button class="refresh pdfb" id="pdfFree" title="Export PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14l3 3 3-3"/></svg><span>Export PDF</span></button><div class="seg" id="fseg"><button class="on" data-f="all">All types</button><button data-f="all-hh">For all homes</button><button data-f="eligible">Eligible homes</button><button data-f="solar">With rooftop solar</button><button data-f="targeted">Poor homes</button></div></div></div>
     <div class="ftypes" id="ftypes"></div>
     <div class="fgrid" id="fgrid"></div>
-    <div class="fnote">Free electricity cuts a home's own saving from rooftop solar, so these states need a different push – for example state-funded rooftop systems, as in Rajasthan and Jammu and Kashmir.</div>
   </section>
 
   <section class="grid facts sec">
@@ -615,14 +613,6 @@ function pdfBoxes(doc,y,items){
     if(it.s){ doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(...C.muted); doc.text(P(it.s),x+3,y+15.2); } });
   return y+h+5;
 }
-function pdfFoot(doc,label){
-  const n=doc.getNumberOfPages();
-  for(let i=1;i<=n;i++){ doc.setPage(i); const W=doc.internal.pageSize.getWidth(), H=doc.internal.pageSize.getHeight();
-    doc.setDrawColor(...C.line); doc.line(14,H-11,W-14,H-11);
-    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...C.faint);
-    doc.text(P(label+(S.source?'   |   Source: '+S.source:'')),14,H-6.5);
-    doc.text(`Page ${i} of ${n}`,W-14,H-6.5,{align:'right'}); }
-}
 const stCol=t=>t==='Ahead'?C.g:t==='Behind'?C.r:t==='Near average'?C.a:C.muted;
 const fileDate=()=>P(S.asOn).replace(/[,:]/g,'').replace(/\s+/g,'-');
 function bihBoxes(){ const me=S.list.find(isMe), T=S.T; return [
@@ -637,11 +627,11 @@ async function exportAllPDF(){
   const J=await pdfLib(); const doc=new J({orientation:'landscape',unit:'mm',format:'a4'}); const T=S.T;
   let y=pdfHead(doc,'PM Surya Ghar: Muft Bijli Yojana - State/UT-wise progress',`All ${S.list.length} states and UTs, ranked by installations   |   India: ${fmt(T.inst)} installations from ${fmt(T.apps)} applications (${f1(T.conv)}%)`);
   y=pdfBoxes(doc,y,bihBoxes());
-  const head=[['Rank','State / UT','Free electricity','Applications','Installations','Installed %','Status','Capacity (MW)','Avg kW','Subsidy (Rs cr)','Added*']];
+  const head=[['Rank','State / UT','Free electricity','Applications','Installations','Installed %','Status','Capacity (MW)','Avg kW','Subsidy (Rs cr)','Added']];
   const shortFree=o=>{const f=FREE_INFO.find(x=>o.state.toLowerCase().includes(x.k)); return o.cat==='free'&&f?`Yes - ${f.units} units/${/2 months/.test(f.per)?'2 months':'month'}`:o.cat==='free'?'Yes':o.cat==='solar'?'With rooftop solar':o.cat==='targeted'?'Poor homes only':'No';};
   const body=S.list.map(o=>[o.rank,P(o.state),P(shortFree(o)),fmt(o.apps),fmt(o.inst),f1(o.conv),status(o).t,f1(o.mw),f2(o.kw),f2(o.cr),o.add==null||isNaN(o.add)?'-':(o.add>=0?'+':'')+fmt(o.add)]);
   body.push(['','India (total)','',fmt(T.apps),fmt(T.inst),f1(T.conv),'',f1(T.mw),f2(T.kw),f2(T.cr),T.add?'+'+fmt(T.add):'-']);
-  doc.autoTable({head,body,startY:y,theme:'grid',rowPageBreak:'avoid',margin:{left:14,right:14,bottom:14},
+  doc.autoTable({head,body,startY:y,theme:'grid',rowPageBreak:'avoid',margin:{left:14,right:14,bottom:12,top:14},
     styles:{font:'helvetica',fontSize:8,cellPadding:1.6,lineColor:C.line,lineWidth:.15,textColor:C.ink,valign:'middle'},
     headStyles:{fillColor:C.head,textColor:C.muted,fontStyle:'bold',halign:'right'},
     columnStyles:{0:{halign:'center',cellWidth:12},1:{halign:'left',cellWidth:54},2:{halign:'left',cellWidth:40},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},6:{halign:'left',cellWidth:23},7:{halign:'right'},8:{halign:'right'},9:{halign:'right'},10:{halign:'right'}},
@@ -650,10 +640,7 @@ async function exportAllPDF(){
       if(last){ d.cell.styles.fontStyle='bold'; d.cell.styles.fillColor=C.head; }
       else if(String(row[1]).toLowerCase().includes(HOME)){ d.cell.styles.fillColor=C.hiT; d.cell.styles.fontStyle='bold'; if(d.column.index<2) d.cell.styles.textColor=C.hi; }
       if(d.column.index===6&&!last){ d.cell.styles.textColor=stCol(row[6]); d.cell.styles.fontStyle='bold'; } }});
-  let y2=doc.lastAutoTable.finalY+5; if(y2>doc.internal.pageSize.getHeight()-20){ doc.addPage(); y2=20; }
-  doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(...C.muted);
-  doc.text(P(`Status compares a state's share of applications installed with India (${f1(T.conv)}%): Ahead = 5 points or more above, Behind = 5 points or more below, otherwise Near average.   * Added = installations added since the previous update.`),14,y2,{maxWidth:doc.internal.pageSize.getWidth()-28});
-  pdfFoot(doc,'PM Surya Ghar - all states'); doc.save(`PMSG_All_States_${fileDate()}.pdf`);
+  doc.save(`PMSG_All_States_${fileDate()}.pdf`);
 }
 
 async function exportFreePDF(){
@@ -672,19 +659,14 @@ async function exportFreePDF(){
   // main table
   const head=[['India rank','State','Type','Scheme','Free units','Who gets it','Condition','Since','Installations','Applications','Installed %','Status']];
   const body=rows.map(r=>{const o=r.o; return [ord(o.rank),P(o.state),FTYPE[r.type][0],P(r.scheme),`${r.units} ${P(r.per)}`,P(r.who),P(r.rule),P(r.since),fmt(o.inst),fmt(o.apps),f1(o.conv),status(o).t];});
-  doc.autoTable({head,body,startY:doc.lastAutoTable.finalY+6,theme:'grid',margin:{left:14,right:14,bottom:14},
+  doc.autoTable({head,body,startY:doc.lastAutoTable.finalY+6,theme:'grid',margin:{left:14,right:14,bottom:12,top:14},
     rowPageBreak:'avoid',styles:{font:'helvetica',fontSize:7.3,cellPadding:1.5,lineColor:C.line,lineWidth:.15,textColor:C.ink,valign:'top',overflow:'linebreak'},
     headStyles:{fillColor:C.head,textColor:C.muted,fontStyle:'bold',valign:'middle',fontSize:7},
     columnStyles:{0:{halign:'center',cellWidth:12},1:{cellWidth:23,fontStyle:'bold'},2:{cellWidth:20},3:{cellWidth:30},4:{cellWidth:19},5:{cellWidth:32},6:{cellWidth:44},7:{cellWidth:18},8:{halign:'right',cellWidth:18},9:{halign:'right',cellWidth:19},10:{halign:'right',cellWidth:13},11:{cellWidth:'auto'}},
     didParseCell:d=>{ if(d.section!=='body') return; const row=body[d.row.index];
       if(String(row[1]).toLowerCase().includes(HOME)){ d.cell.styles.fillColor=C.hiT; if(d.column.index<2) d.cell.styles.textColor=C.hi; }
       if(d.column.index===11){ d.cell.styles.textColor=stCol(row[11]); d.cell.styles.fontStyle='bold'; } }});
-  let y2=doc.lastAutoTable.finalY+6; const H=doc.internal.pageSize.getHeight(), W=doc.internal.pageSize.getWidth();
-  const note=P('Free electricity reduces a household\'s own saving from rooftop solar, so these states need a different push - for example state-funded rooftop systems, as in Rajasthan and Jammu and Kashmir. Scheme details are as reported in official announcements and news; check for later changes.');
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); const lines=doc.splitTextToSize(note,W-36); if(y2+lines.length*4+8>H-14){ doc.addPage(); y2=20; }
-  doc.setFillColor(255,248,236); doc.setDrawColor(251,227,189); doc.roundedRect(14,y2,W-28,lines.length*4+6,2,2,'FD'); doc.setFillColor(227,162,26); doc.rect(14,y2,1.6,lines.length*4+6,'F');
-  doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(122,75,18); doc.text(lines,19,y2+5);
-  pdfFoot(doc,'PM Surya Ghar - free electricity states'); doc.save(`PMSG_Free_Electricity_States_${fileDate()}.pdf`);
+  doc.save(`PMSG_Free_Electricity_States_${fileDate()}.pdf`);
 }
 
 const TILES={'jammu':[3,0,'JK'],'ladakh':[4,0,'LA'],'punjab':[3,1,'PB'],'himachal':[4,1,'HP'],'chandigarh':[2,1,'CH'],
