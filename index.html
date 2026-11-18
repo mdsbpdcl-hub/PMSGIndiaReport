@@ -200,6 +200,51 @@ th .ar{color:var(--hi)}
 .lgap{font-size:11.5px;color:var(--muted);text-align:center;margin:-2px 0}
 .sech{display:flex;align-items:center;gap:8px}
 .sech .dotc{width:8px;height:8px;border-radius:50%;background:var(--hi)}
+
+/* free electricity section */
+.freesec{background:linear-gradient(180deg,#fffaf3,#fff 160px)}
+.fbadge{width:34px;height:34px;border-radius:10px;background:#fff1e0;display:grid;place-items:center;font-size:17px;flex:none;border:1px solid #fde1bf}
+.sech{align-items:flex-start}
+.ftypes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+@media(max-width:980px){.ftypes{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ft{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;min-width:0}
+.ft:hover{border-color:#cfd5de}
+.ft.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.ft .tt{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:650}
+.ft .tt i{width:10px;height:10px;border-radius:3px;display:inline-block;flex:none}
+.ft .tn{font-size:24px;font-weight:700;margin-top:4px;line-height:1.1}
+.ft .tn small{font-size:12.5px;color:var(--muted);font-weight:500}
+.ft .ts{font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ft .tc{font-size:12px;margin-top:6px;color:#344054}
+.fgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media(max-width:1100px){.fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.fgrid{grid-template-columns:minmax(0,1fr)}}
+.fc{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px 16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;position:relative;overflow:hidden;min-width:0;transition:box-shadow .15s,transform .15s}
+.fc:hover{box-shadow:0 8px 20px -12px rgba(16,24,40,.3);transform:translateY(-1px)}
+.fc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--fcol)}
+.fc.me{border-color:#fbc9a3;background:linear-gradient(180deg,#fff5ec,#fff 120px);box-shadow:0 0 0 2px #fde0c8}
+.fc .top{display:flex;align-items:flex-start;gap:10px}
+.fc .rb{min-width:34px;height:34px;border-radius:10px;background:var(--nt);display:grid;place-items:center;font-weight:700;font-size:13px;color:var(--muted);flex:none;padding:0 4px}
+.fc.me .rb{background:var(--hi);color:#fff}
+.fc .nm{font-weight:700;font-size:15px;line-height:1.25}
+.fc .scheme{font-size:12px;color:var(--muted)}
+.fc .units{display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.fc .units b{font-size:26px;font-weight:700;letter-spacing:-.01em;color:var(--fcolT)}
+.fc .units span{font-size:12.5px;color:var(--muted)}
+.fc dl{display:grid;grid-template-columns:78px minmax(0,1fr);gap:4px 10px;margin:0;font-size:12.5px}
+.fc dt{color:var(--faint);font-weight:500}
+.fc dd{margin:0;color:#344054}
+.fc .perf{border-top:1px solid var(--line2);padding-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fc .perf div{min-width:0}
+.fc .perf .pl{font-size:11px;color:var(--faint)}
+.fc .perf .pv{font-size:14.5px;font-weight:700}
+.fc .cbar{grid-column:1/-1;position:relative;height:7px;background:var(--track);border-radius:4px}
+.fc .cbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.fc .cbar s{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ref)}
+.fnote{margin-top:14px;font-size:12.5px;color:#7a4b12;background:#fff8ec;border:1px solid #fbe3bd;border-left:4px solid #e3a21a;border-radius:10px;padding:10px 12px}
+.insw{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px}
+@media(max-width:820px){.insw{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:640px){#fseg{display:none}}
 @media(max-width:600px){.strip .tl.odd{display:none}.tile .fz{display:none}.tmap{gap:3px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -372,6 +417,14 @@ function render(){
     </div>
   </section>
 
+  <section class="card sec freesec">
+    <div class="hdr"><div class="sech"><span class="fbadge">⚡</span><div><h2>States where electricity is free</h2><div class="sub" style="margin:0">Free household electricity schemes and how each state is doing on rooftop solar</div></div></div>
+      <div class="seg" id="fseg"><button class="on" data-f="all">All types</button><button data-f="all-hh">For all homes</button><button data-f="eligible">Eligible homes</button><button data-f="solar">With rooftop solar</button><button data-f="targeted">Poor homes</button></div></div>
+    <div class="ftypes" id="ftypes"></div>
+    <div class="fgrid" id="fgrid"></div>
+    <div class="fnote">Free electricity cuts a home's own saving from rooftop solar, so these states need a different push – for example state-funded rooftop systems, as in Rajasthan and Jammu and Kashmir.</div>
+  </section>
+
   <section class="grid facts sec">
     ${fact('Rank in capacity (MW)',ord(rankBy(list,'mw',me))+' of '+list.length)}
     ${fact('Rank among free power states',me.frank?ord(me.frank)+' of '+fr.length:'–')}
@@ -406,9 +459,7 @@ function render(){
     <div class="card"><h2>How many applications turn into installations</h2><div class="sub">Share of applications installed</div><div class="cmp" id="cmp"></div></div>
   </section>
 
-  <section class="grid two sec">
-    <div class="card"><h2>Ranking – states where electricity is free</h2><div class="sub">By installations. Solar-linked and targeted schemes are shown in the full table.</div><div class="rk" id="freerk"></div></div>
-    <div class="card"><h2>What the figures say</h2><div class="sub">Worked out from the latest data</div><div class="ins" id="ins"></div></div>
+  <section class="card sec"><h2>What the figures say</h2><div class="sub">Worked out from the latest data</div><div class="ins insw" id="ins"></div>
   </section>
 
   <section class="card sec" id="trendSec" style="display:none"><h2>Bihar installations – day by day</h2><div class="sub">Total installations on each update day</div><div class="trend" id="trend"></div></section>
@@ -422,7 +473,7 @@ function render(){
     <div class="tbox"><table id="tbl"></table></div>
   </section>`;
 
-  drawMap(); drawLadder(); drawStrip(); drawTop(); drawCmp(); drawFree(); drawInsights(me,next,prev,atNat,rankAtNat); drawTrend(); drawBands(); drawTable();
+  drawFreeSec(); drawMap(); drawLadder(); drawStrip(); drawTop(); drawCmp(); drawInsights(me,next,prev,atNat,rankAtNat); drawTrend(); drawBands(); drawTable();
   countUp(); setTimeout(()=>{document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w); document.querySelectorAll('[data-h]').forEach(e=>e.style.height=e.dataset.h);},60);
   $('#q').addEventListener('input',e=>{query=e.target.value;drawTable();});
 }
@@ -436,6 +487,52 @@ function metric(l,v,unit,ex,add){
 }
 function fact(l,x){ return `<div class="fact"><div class="l">${l}</div><div class="x">${x}</div></div>`; }
 
+
+/* Free household electricity schemes – edit here when a state changes its policy */
+const FREE_INFO=[
+ {k:'punjab',type:'all-hh',scheme:'Free power for domestic consumers',units:300,per:'units / month',who:'All domestic households',rule:'600 units free per 2-month bill; if use goes above it, the whole bill is charged',since:'July 2022'},
+ {k:'delhi',type:'all-hh',scheme:'Power subsidy scheme',units:200,per:'units / month',who:'Domestic consumers who opt in',rule:'50% subsidy on 201–400 units',since:'August 2019'},
+ {k:'jharkhand',type:'all-hh',scheme:'Mukhyamantri Urja Khushhali Yojana',units:200,per:'units / month',who:'Domestic consumers using up to 200 units',rule:'Zero bill incl. fixed charges and duty; old dues of these homes waived',since:'2022 (200 units from mid-2024)'},
+ {k:'karnataka',type:'all-hh',scheme:'Gruha Jyothi',units:200,per:'units / month (max)',who:'Residential homes, one meter each',rule:'Free units = past average use + 10 units; door-to-door re-verification in 2026',since:'August 2023'},
+ {k:'tamil',type:'all-hh',scheme:'Free power for domestic consumers',units:200,per:'units / 2 months',who:'Homes using up to 500 units in 2 months',rule:'Homes above 500 units still get 100 units free per 2 months',since:'10 May 2026 (100 units earlier)'},
+ {k:'bihar',type:'all-hh',scheme:'Mukhya Mantri Vidyut Upbhokta Sahayata Yojana',units:125,per:'units / month',who:'All domestic consumers (about 1.67 crore get a zero bill)',rule:'100% state subsidy on the first 125 units',since:'1 August 2025'},
+ {k:'telangana',type:'eligible',scheme:'Gruha Jyothi',units:200,per:'units / month',who:'Families with a white ration card',rule:'If use crosses 200 units, the full bill is charged',since:'March 2024'},
+ {k:'himachal',type:'eligible',scheme:'Free power up to 125 units',units:125,per:'units / month',who:'Families that do not pay income tax',rule:'Subsidy on at most 2 meters per family',since:'2022 (limited in 2024)'},
+ {k:'rajasthan',type:'solar',scheme:'Mukhyamantri Nishulk Bijli Yojana – 150 units',units:150,per:'units / month',who:'Registered free-power families who install rooftop solar',rule:'1.1 kW rooftop system: ₹33,000 central + ₹17,000 state subsidy; earlier 100 units free',since:'14 October 2025'},
+ {k:'jammu',type:'solar',scheme:'Free power for AAY families',units:200,per:'units / month',who:'Antyodaya (AAY) families – about 2.2 lakh',rule:'Through 2 kW rooftop systems under PM Surya Ghar; rolling out',since:'Rolling out in 2026'},
+ {k:'west bengal',type:'targeted',scheme:'Hasir Alo',units:75,per:'units / month',who:'Poor households with low use',rule:'Current status to be checked after the 2026 change of government',since:'Earlier scheme'}
+];
+const FTYPE={'all-hh':['For all homes','#2f65a8','States that give free units to every household (within a limit)'],
+ 'eligible':['Eligible homes only','#0f8a7e','Free units only for families that meet a condition'],
+ 'solar':['With rooftop solar','#c4661f','Free units come from a rooftop solar system'],
+ 'targeted':['Poor homes only','#8e4fc7','Small free quantity for poor households']};
+let fFilter='all';
+function drawFreeSec(){
+  const L=S.list; const rows=FREE_INFO.map(f=>{const o=L.find(x=>x.state.toLowerCase().includes(f.k)); return o?{...f,o}:null;}).filter(Boolean)
+    .sort((a,b)=>b.o.inst-a.o.inst);
+  const freeOnly=rows.filter(r=>r.type==='all-hh'||r.type==='eligible'); freeOnly.forEach((r,i)=>r.fr=i+1);
+  // type tiles
+  $('#ftypes').innerHTML=Object.entries(FTYPE).map(([k,[t,c]])=>{const g=rows.filter(r=>r.type===k); if(!g.length) return '';
+    const a=g.reduce((s,r)=>s+(r.o.apps||0),0), i=g.reduce((s,r)=>s+r.o.inst,0);
+    return `<div class="ft ${fFilter===k?'on':''}" data-f="${k}"><div class="tt"><i style="background:${c}"></i>${t}</div><div class="tn">${g.length} <small>${g.length>1?'states':'state'}</small></div>
+      <div class="ts" title="${g.map(r=>esc(r.o.state)).join(', ')}">${g.map(r=>esc(r.o.state)).join(', ')}</div><div class="tc"><b>${f1(a?i/a*100:0)}%</b> of applications installed · ${lakh(i)}</div></div>`;}).join('');
+  const show=fFilter==='all'?rows:rows.filter(r=>r.type===fFilter);
+  $('#fgrid').innerHTML=show.map(r=>{const o=r.o, c=FTYPE[r.type][1], st=status(o);
+    return `<div class="fc ${isMe(o)?'me':''}" style="--fcol:${c};--fcolT:${c}" data-s="${esc(o.state)}">
+      <div class="top"><div class="rb" title="Rank in India by installations">${ord(o.rank)}</div><div style="min-width:0;flex:1"><div class="nm">${esc(o.state)}</div><div class="scheme">${esc(r.scheme)}</div></div><span class="chip" style="background:${c}14;color:${c}">${FTYPE[r.type][0]}</span></div>
+      <div class="units"><b>${r.units}</b><span>${r.per} free</span></div>
+      <dl><dt>Who gets it</dt><dd>${esc(r.who)}</dd><dt>Condition</dt><dd>${esc(r.rule)}</dd><dt>Since</dt><dd>${esc(r.since)}</dd></dl>
+      <div class="perf">
+        <div><div class="pl">Installations</div><div class="pv">${fmt(o.inst)}</div></div>
+        <div><div class="pl">Applications</div><div class="pv">${fmt(o.apps)}</div></div>
+        <div><div class="pl">Installed</div><div class="pv">${f1(o.conv)}% <span class="chip ${st.c}" style="font-size:10.5px;padding:0 6px">${st.t}</span></div></div>
+        <div class="cbar" title="Share of applications installed; line = India ${f1(S.T.conv)}%"><i style="width:${Math.min(100,o.conv)}%;background:${isMe(o)?'var(--hi)':c}"></i><s style="left:${S.T.conv}%"></s></div>
+      </div></div>`;}).join('');
+  $('#fgrid').querySelectorAll('.fc').forEach(e=>e.onclick=()=>openDrawer(e.dataset.s));
+  const setF=f=>{fFilter=f; $('#fseg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.f===f)); drawFreeSec();};
+  $('#fseg').onclick=e=>{const b=e.target.closest('button'); if(b) setF(b.dataset.f);};
+  $('#ftypes').querySelectorAll('.ft').forEach(e=>e.onclick=()=>setF(fFilter===e.dataset.f?'all':e.dataset.f));
+}
 
 const TILES={'jammu':[3,0,'JK'],'ladakh':[4,0,'LA'],'punjab':[3,1,'PB'],'himachal':[4,1,'HP'],'chandigarh':[2,1,'CH'],
  'haryana':[3,2,'HR'],'uttarakhand':[4,2,'UK'],'sikkim':[6,2,'SK'],'arunachal':[9,2,'AR'],
