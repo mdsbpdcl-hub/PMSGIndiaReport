@@ -188,7 +188,9 @@ def to_frame(rows):
     width = max(len(header), *(len(r) for r in data))
     header = [h or f"Col{i+1}" for i, h in enumerate(header)] + [f"Col{i+1}" for i in range(len(header), width)]
     data = [list(r) + [""] * (width - len(r)) for r in data]
-    return pd.DataFrame(data, columns=header).map(to_number)
+    df = pd.DataFrame(data, columns=header)
+    # DataFrame.map needs pandas 2.1+; older pandas has applymap
+    return df.map(to_number) if hasattr(df, 'map') else df.applymap(to_number)
 
 
 def push_to_sheet(raw):

@@ -33,7 +33,7 @@ const CFG = {
   SHEET_STATE: 'State-wise',
   SHEET_MONTH: 'Month-wise',
   SHEET_HISTORY: 'History',
-  MIRROR_URL: 'https://solentra.in/solar-dashboard.html',
+  MIRROR_URL: 'https://solentra.in/data/pmsg-snapshot.json',   // daily copy of the portal (data file)
   TZ: 'Asia/Kolkata',
   RUN_HOURS: [9, 18],      // checks at 9 AM and 6 PM IST every day
   HIGHLIGHT_STATE: 'bihar'
@@ -147,13 +147,33 @@ function rememberUrl_() {
 /* ============================ SOURCE 2: DAILY COPY SITE ============================ */
 
 function updateFromMirror() {
-  const res = UrlFetchApp.fetch(CFG.MIRROR_URL, { muteHttpExceptions: true, followRedirects: true });
+  const res = UrlFetchApp.fetch(CFG.MIRROR_URL + '?t=' + Date.now(), { muteHttpExceptions: true, followRedirects: true });
   if (res.getResponseCode() !== 200) throw new Error('Copy site returned HTTP ' + res.getResponseCode());
-  const rows = htmlTableRows_(res.getContentText());
-  if (rows.length < 5) throw new Error('No state table found on the copy site.');
-  const n = writeState_(normaliseRows_(rows), 'solentra.in daily copy of National Portal (unofficial)');
+  const snap = JSON.parse(res.getContentText());
+  const list = snapshotToList_(snap);
+  if (list.length < 30) throw new Error('Copy site data looks incomplete (' + list.length + ' states).');
+  const when = snap.capturedAt ? new Date(snap.capturedAt) : null;
+  const n = writeState_(list, 'National Portal (pmsuryaghar.gov.in) via daily copy at solentra.in (unofficial)', when);
   toast_('Updated ' + n + ' states.');
   return n;
+}
+
+/** snapshot JSON → [{state, apps, inst, mw, cr}]; skips the national row (stateId "NT") */
+function snapshotToList_(snap) {
+  return (snap.states || []).filter(s => s.stateId !== 'NT' && s.stateName).map(s => ({
+    state: titleCase_(s.stateName),
+    apps: Number(s.applications) || 0,
+    inst: Number(s.installations) || 0,
+    mw: Math.round((Number(s.capacityKW) || 0) / 10) / 100,       // kW → MW, 2 decimals
+    cr: Math.round((Number(s.subsidyAmount) || 0) / 1e5) / 100     // ₹ → crore, 2 decimals
+  }));
+}
+
+function titleCase_(name) {
+  return String(name).trim().toLowerCase()
+    .replace(/\b([a-z])/g, (m, c) => c.toUpperCase())
+    .replace(/\b(And|Of)\b/g, w => w.toLowerCase())
+    .replace(/^Nct /, 'NCT ');
 }
 
 /* ============================ PARSING (pure functions) ============================ */
@@ -229,7 +249,7 @@ function freePower_(state) {
 
 /* ============================ WRITING ============================ */
 
-function writeState_(list, source) {
+function writeState_(list, source, dataTime) {
   const ss = SpreadsheetApp.getActive();
   const sh = ss.getSheetByName(CFG.SHEET_STATE) || ss.insertSheet(CFG.SHEET_STATE, 0);
   const prev = previousSnapshot_();                       // state -> installations (last earlier day)
@@ -266,7 +286,7 @@ function writeState_(list, source) {
   const hi = body.findIndex(r => r[1].toLowerCase().indexOf(CFG.HIGHLIGHT_STATE) >= 0);
   if (hi >= 0) sh.getRange(hi + 2, 1, 1, HEADERS.length).setBackground('#fff4cc').setFontWeight('bold');
   sh.getRange(1, 12, 3, 2).setValues([
-    ['Last updated', Utilities.formatDate(new Date(), CFG.TZ, 'dd-MMM-yyyy HH:mm') + ' IST'],
+    ['Last updated', Utilities.formatDate(dataTime || new Date(), CFG.TZ, 'dd-MMM-yyyy HH:mm') + ' IST'],
     ['Source', source],
     ['Sorted by', 'Installations (high to low)']
   ]);

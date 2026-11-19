@@ -12,7 +12,7 @@ Daily state-wise progress of **PM Surya Ghar: Muft Bijli Yojana**, with Bihar's 
 
 ## How it updates (fully online)
 
-1. **9 AM and 6 PM daily** – the script inside the "PMSG-MBY All States" sheet reads the public daily copy of the National Portal (solentra.in, unofficial), sorts states by installations, adds ranks, free-electricity details, India total, change since last update, and a History tab.
+1. **9 AM and 6 PM daily** – the script inside the "PMSG-MBY All States" sheet reads the daily data file of the public copy of the National Portal (solentra.in/data/pmsg-snapshot.json, unofficial), sorts states by installations, adds ranks, free-electricity details, India total, change since last update, and a History tab.
 2. **Dashboard** – reads the sheet every time it is opened or refreshed.
 
 No PC is needed. If the copy site fails or changes, the sheet keeps the last good figures (the dashboard shows their date).
