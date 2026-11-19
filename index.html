@@ -273,6 +273,18 @@ th .ar{color:var(--hi)}
 .fbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .pdfb svg{width:15px;height:15px}
 .pdfb:disabled{opacity:.6;cursor:wait}
+
+.scopebar{margin-top:16px;display:flex;gap:10px;align-items:flex-start;background:#fff8ec;border:1px solid #fbe3bd;border-left:4px solid #e3a21a;border-radius:12px;padding:10px 14px;font-size:13.5px;color:#5c3b0b}
+.sb-ic{font-size:16px;line-height:1.3}
+.sb-link{border:0;background:none;color:var(--hi);font-weight:600;cursor:pointer;padding:0;margin-left:4px;text-decoration:underline;font:inherit;font-weight:600}
+.tile.dim{opacity:.22;filter:grayscale(.6)}
+.tile.dim:hover{opacity:.6}
+.strip .dt.dim{opacity:.2}
+.strip .ref2{border-left-color:var(--base2)}
+.bt .mk2{background:var(--base2)}
+.bt .mk2 span{color:var(--base2);top:auto;bottom:-18px}
+.pills button[data-scope=free].on{background:var(--hi);color:#fff}
+.rankbox .chip{white-space:normal;line-height:1.35;padding:3px 9px}
 @media(max-width:640px){#fseg{display:none}}
 @media(max-width:600px){.strip .tl.odd{display:none}.tile .fz{display:none}.tmap{gap:3px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -284,8 +296,8 @@ th .ar{color:var(--hi)}
     <div class="badge" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 4 14h6.5L9.5 22 20 9.5h-6.6L13.5 2z"/></svg></div>
     <div class="ttl"><h1>PM Surya Ghar – Bihar in India</h1><div class="ason" id="ason">Loading…</div></div>
     <div class="pills" role="tablist" aria-label="Which states">
-      <button class="on" data-scope="all">All states</button>
-      <button data-scope="free">Free power states</button>
+      <button class="on" data-scope="free">⚡ Free power states</button>
+      <button data-scope="all">All states</button>
     </div>
     <button class="refresh" id="force" title="Force update"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Force update</span></button>
     <button class="refresh" id="refresh" title="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg><span>Refresh</span></button>
@@ -361,7 +373,7 @@ function parseCSV(t){
 
 /* ============================ data ============================ */
 let S=null;           // {list, asOn, hist}
-let scope='all', sortKey='inst', sortDir=-1, band='all', query='';
+let scope='free', sortKey='inst', sortDir=-1, band='all', query='';
 
 const csvUrl = sheet => `https://docs.google.com/spreadsheets/d/${DATA_ID}/gviz/tq?tqx=out:csv&headers=1${sheet?'&sheet='+encodeURIComponent(sheet):''}&_=${Date.now()}`;
 async function getRows(sheet){
@@ -442,31 +454,37 @@ function render(){
   const {list,T,fr}=S; const me=list.find(isMe);
   $('#ason').textContent='As on '+S.asOn+(S.live?'':' · saved copy, latest figures could not be loaded');
   if(!me){ $('#app').innerHTML='<div class="state"><div class="card"><b>No data yet</b><div class="line2">Bihar figures are not in the latest data.</div></div></div>'; return; }
-  const next=list[me.rank-2], prev=list[me.rank];
+  const F=scope==='free', L=scoped(), G=groupStats(L), r=L.indexOf(me)+1;
+  const next=L[r-2], prev=L[r];
   const st=status(me);
-  const share=me.inst/T.inst*100;
-  const atNat=Math.round(me.apps*T.conv/100);
-  const rankAtNat=list.filter(o=>o!==me&&o.inst>atNat).length+1;
+  const gd=me.conv-G.conv, gst=gd>=5?{c:'g',t:'Ahead of'}:gd<=-5?{c:'r',t:'Behind'}:{c:'a',t:'Near'};
+  const share=me.inst/G.inst*100;
+  const atG=Math.round(me.apps*G.conv/100);
+  const rankAtG=L.filter(o=>o!==me&&o.inst>atG).length+1;
+  const rankIn=k=>L.filter(o=>o[k]!=null&&o[k]>me[k]).length+1;
 
   $('#app').innerHTML=`
+  ${F?`<div class="scopebar"><span class="sb-ic">⚡</span><div><b>Showing the ${L.length} states where household electricity is free.</b> Ranks, averages, map, charts and table below are among these states. <button class="sb-link" data-go="all">Show all ${list.length} states</button></div></div>`:''}
   <section class="card head">
     <div class="rankbox">
-      <div class="eyebrow">Bihar · all-India rank</div>
-      <div class="rankbig">${ord(me.rank)} <small>of ${list.length}</small></div>
-      <div class="line2">by installations among states and UTs</div>
+      <div class="eyebrow">Bihar · ${F?'rank among free power states':'all-India rank'}</div>
+      <div class="rankbig">${ord(r)} <small>of ${L.length}</small></div>
+      <div class="line2">${F?`by installations among the ${L.length} states that give free household electricity`:'by installations among states and UTs'}</div>
       <div class="chips">
-        <span class="chip ${st.c}"><i></i>${st.t} India on conversion</span>
-        ${me.frank?`<span class="chip t">${ord(me.frank)} of ${fr.length} free power states</span>`:''}
+        <span class="chip ${gst.c}"><i></i>${gst.t} ${F?'free-states average':'India'} on conversion</span>
+        ${F?`<span class="chip t">${ord(me.rank)} of ${list.length} in India</span>`:(me.frank?`<span class="chip t">${ord(me.frank)} of ${fr.length} free power states</span>`:'')}
       </div>
     </div>
     <div class="metrics">
-      ${metric('Installations',`<span data-count="${me.inst}">0</span>`,'',`${f2(share)}% of India's ${lakh(T.inst)}`, me.add)}
+      ${metric('Installations',`<span data-count="${me.inst}">0</span>`,'',`${f2(share)}% of ${F?'all free power states':"India's"} ${lakh(G.inst)}`, me.add)}
       ${metric('Applications',fmt(me.apps),'',`${lakh(me.pend)} waiting for installation`)}
-      ${metric('Capacity installed',f1(me.mw),' MW',`${f2(me.kw)} kW per house · India ${f2(T.kw)} kW`)}
+      ${metric('Capacity installed',f1(me.mw),' MW',`${f2(me.kw)} kW per house · ${F?'free states':'India'} ${f2(G.kw)} kW`)}
       ${metric('Subsidy received','₹'+f1(me.cr),' crore',`₹${fmt(me.cr*1e7/me.inst)} per house`)}
       <div class="bullet">
-        <div class="t"><span><b>Applications installed</b> – Bihar <b style="color:var(--hi)">${f1(me.conv)}%</b></span><span class="line2">India ${f1(T.conv)}% · gap ${f1(T.conv-me.conv)} points</span></div>
-        <div class="bt"><div class="f" data-w="${Math.min(100,me.conv)}%"></div><div class="mk" style="left:${Math.min(100,T.conv)}%"><span>India</span></div></div>
+        <div class="t"><span><b>Applications installed</b> – Bihar <b style="color:var(--hi)">${f1(me.conv)}%</b></span><span class="line2">${F?`Free states ${f1(G.conv)}% · India ${f1(T.conv)}%`:`India ${f1(T.conv)}% · gap ${f1(T.conv-me.conv)} points`}</span></div>
+        <div class="bt"><div class="f" data-w="${Math.min(100,me.conv)}%"></div>
+          ${F?`<div class="mk mk2" style="left:${Math.min(100,G.conv)}%"><span>Free states</span></div>`:''}
+          <div class="mk" style="left:${Math.min(100,T.conv)}%"><span>India</span></div></div>
         <div class="axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
       </div>
     </div>
@@ -480,23 +498,23 @@ function render(){
   </section>
 
   <section class="grid facts sec">
-    ${fact('Rank in capacity (MW)',ord(rankBy(list,'mw',me))+' of '+list.length)}
-    ${fact('Rank among free power states',me.frank?ord(me.frank)+' of '+fr.length:'–')}
-    ${fact('Rank in applications',ord(rankBy(list,'apps',me))+' of '+list.length)}
-    ${fact('Rank in conversion',ord(rankBy(list,'conv',me))+' of '+list.length)}
-    ${fact('Needed to move up one place',next?fmt(next.inst-me.inst+1)+' more':'Top')}
-    ${fact("At India's conversion rate",lakh(atNat)+' ('+ord(rankAtNat)+')')}
+    ${F?fact('Rank in India (installations)',ord(me.rank)+' of '+list.length):fact('Rank among free power states',me.frank?ord(me.frank)+' of '+fr.length:'–')}
+    ${fact('Rank in applications',ord(rankIn('apps'))+' of '+L.length)}
+    ${fact('Rank in % installed',ord(rankIn('conv'))+' of '+L.length)}
+    ${fact('Rank in capacity (MW)',ord(rankIn('mw'))+' of '+L.length)}
+    ${fact('Needed to move up one place',next?fmt(next.inst-me.inst+1)+' more (pass '+esc(next.state)+')':'Top')}
+    ${fact(F?"At free states' average rate":"At India's conversion rate",lakh(atG)+' ('+ord(rankAtG)+')')}
   </section>
 
   <section class="grid mapwrap sec">
     <div class="card">
-      <div class="hdr"><div><h2>India at a glance</h2><div class="sub">Each square is a state or UT, placed roughly where it is on the map. ⚡ = free electricity.</div></div>
+      <div class="hdr"><div><h2>India at a glance</h2><div class="sub">Each square is a state or UT, placed roughly where it is on the map. ⚡ = free electricity.${F?' Other states are faded.':''}</div></div>
         <div class="seg" id="mapseg"><button class="${mapMode==='inst'?'on':''}" data-m="inst">Installations</button><button class="${mapMode==='conv'?'on':''}" data-m="conv">% installed</button></div></div>
       <div class="tmap" id="tmap"></div>
       <div class="scale" id="mscale"></div>
     </div>
     <div class="card">
-      <h2>Close to Bihar in the ranking</h2><div class="sub">States just above and below Bihar, by installations</div>
+      <h2>Close to Bihar in the ranking</h2><div class="sub">${F?'Free power states':'States'} just above and below Bihar, by installations</div>
       <div class="ladder" id="ladder"></div>
     </div>
   </section>
@@ -528,9 +546,10 @@ function render(){
     <div class="tbox"><table id="tbl"></table></div>
   </section>`;
 
-  drawFreeSec(); drawMap(); drawLadder(); drawStrip(); drawTop(); drawCmp(); drawInsights(me,next,prev,atNat,rankAtNat); drawTrend(); drawBands(); drawTable();
+  drawFreeSec(); drawMap(); drawLadder(); drawStrip(); drawTop(); drawCmp(); drawInsights(me,list[me.rank-2],list[me.rank],Math.round(me.apps*T.conv/100),list.filter(o=>o!==me&&o.inst>Math.round(me.apps*T.conv/100)).length+1); drawTrend(); drawBands(); drawTable();
   countUp(); setTimeout(()=>{document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w); document.querySelectorAll('[data-h]').forEach(e=>e.style.height=e.dataset.h);},60);
   $('#q').addEventListener('input',e=>{query=e.target.value;drawTable();});
+  const sbl=document.querySelector('.sb-link'); if(sbl) sbl.onclick=()=>setScope('all');
   $('#pdfFree').onclick=()=>withBtn('pdfFree',exportFreePDF); $('#pdfAll').onclick=()=>withBtn('pdfAll',exportAllPDF);
 }
 
@@ -688,17 +707,17 @@ function drawMap(){
   let h=''; const used=new Set();
   L.forEach(o=>{const t=tileOf(o); if(!t) return; used.add(t[2]); const v=mapMode==='inst'?o.inst:o.conv; const c=colr(v); const dark=RAMP.indexOf(c)>=4;
     const lab=mapMode==='inst'?(v>=1e5?IN1.format(v/1e5)+'L':v>=1000?Math.round(v/1000)+'k':fmt(v)):f1(v)+'%';
-    h+=`<div class="tile ${isMe(o)?'me':''}" style="grid-column:${t[0]+1};grid-row:${t[1]+1};background:${c};color:${dark?'#fff':'#1d2a3d'}" data-s="${esc(o.state)}" data-tip="${esc(o.state)} · ${fmt(o.inst)} installed · ${f1(o.conv)}% of applications · ${ord(o.rank)} in India${o.cat==='free'?' · free electricity':''}">${o.cat==='free'?'<svg class="fz" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 4 14h6.5L9.5 22 20 9.5h-6.6z"/></svg>':''}${t[2]}<small>${lab}</small></div>`;});
+    h+=`<div class="tile ${isMe(o)?'me':''}${scope==='free'&&o.cat!=='free'?' dim':''}" style="grid-column:${t[0]+1};grid-row:${t[1]+1};background:${c};color:${dark?'#fff':'#1d2a3d'}" data-s="${esc(o.state)}" data-tip="${esc(o.state)} · ${fmt(o.inst)} installed · ${f1(o.conv)}% of applications · ${ord(o.rank)} in India${o.cat==='free'?' · free electricity':''}">${o.cat==='free'?'<svg class="fz" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 2 4 14h6.5L9.5 22 20 9.5h-6.6z"/></svg>':''}${t[2]}<small>${lab}</small></div>`;});
   $('#tmap').innerHTML=h; tipify('#tmap .tile'); $('#tmap').querySelectorAll('.tile').forEach(e=>e.onclick=()=>openDrawer(e.dataset.s));
   const labs=mapMode==='inst'?['<1k','1k','5k','20k','60k','1.5L','4L+']:['<20%','20%','35%','50%','60%','70%','80%+'];
   $('#mscale').innerHTML=`<span>${mapMode==='inst'?'Fewer':'Lower'}</span><span class="sw">${RAMP.map((c,i)=>`<i style="background:${c}" title="${labs[i]}"></i>`).join('')}</span><span>${mapMode==='inst'?'More installations':'Higher share installed'}</span><span style="margin-left:8px;display:inline-flex;align-items:center;gap:5px"><i style="width:12px;height:12px;border-radius:3px;outline:2px solid var(--hi);display:inline-block;background:#fff"></i>Bihar</span>`;
   $('#mapseg').onclick=e=>{const b=e.target.closest('button'); if(!b) return; mapMode=b.dataset.m; $('#mapseg').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); drawMap();};
 }
 function drawLadder(){
-  const L=S.list, i=L.findIndex(isMe); const from=Math.max(0,i-3), to=Math.min(L.length,i+4);
+  const L=scoped(), i=L.findIndex(isMe); if(i<0) return; const from=Math.max(0,i-3), to=Math.min(L.length,i+4);
   let h=''; for(let k=from;k<to;k++){ const o=L[k]; const prevO=L[k-1];
     if(k>from){ const d=prevO.inst-o.inst; h+=`<div class="lgap">▲ ${fmt(d)} gap</div>`; }
-    h+=`<div class="lr ${isMe(o)?'me':''}" data-s="${esc(o.state)}"><span class="rn">${ord(o.rank)}</span><span class="sn">${esc(o.state)}${o.cat==='free'?' ⚡':''}</span><span class="sv">${fmt(o.inst)}<small>${f1(o.conv)}% installed</small></span></div>`; }
+    h+=`<div class="lr ${isMe(o)?'me':''}" data-s="${esc(o.state)}"><span class="rn">${ord(k+1)}</span><span class="sn">${esc(o.state)}${o.cat==='free'?' ⚡':''}</span><span class="sv">${fmt(o.inst)}<small>${f1(o.conv)}% installed</small></span></div>`; }
   $('#ladder').innerHTML=h; $('#ladder').querySelectorAll('.lr').forEach(e=>e.onclick=()=>openDrawer(e.dataset.s));
 }
 
@@ -710,12 +729,16 @@ function drawStrip(){
   const sorted=L.slice().sort((a,b)=>a.conv-b.conv); const lanes=[];
   sorted.forEach(o=>{ const x=o.conv; let lane=0; while(lanes[lane]!=null && x-lanes[lane]<1.6) lane++; lanes[lane]=x; o._lane=lane; });
   sorted.forEach(o=>{ const off=[0,-12,12,-24,24,-36,36][o._lane%7]; const cls=(isMe(o)?'me':'')+(o.cat==='free'?' free':'');
-    h+=`<div class="dt ${cls}" style="left:${o.conv}%;top:${70+off}px" data-s="${esc(o.state)}" data-tip="${esc(o.state)}: ${f1(o.conv)}% installed · ${fmt(o.inst)} of ${fmt(o.apps)}"></div>`; });
+    const dimc=scope==='free'&&o.cat!=='free'?' dim':'';
+    h+=`<div class="dt ${cls}${dimc}" style="left:${o.conv}%;top:${70+off}px" data-s="${esc(o.state)}" data-tip="${esc(o.state)}: ${f1(o.conv)}% installed · ${fmt(o.inst)} of ${fmt(o.apps)}"></div>`; });
+  if(scope==='free'){ const G=groupStats(scoped()); h+=`<div class="ref ref2" style="left:${G.conv}%"></div><div class="lab" style="left:${G.conv}%;top:-16px;color:var(--base2)">Free states ${f1(G.conv)}%</div>`; }
   const me=L.find(isMe); if(me) h+=`<div class="lab" style="left:${Math.max(4,me.conv)}%;top:132px;color:var(--hi)">Bihar ${f1(me.conv)}%</div>`;
   el.innerHTML=h; tipify('#strip .dt'); el.querySelectorAll('.dt').forEach(d=>d.onclick=()=>openDrawer(d.dataset.s));
 }
 
 function scoped(){ return scope==='free'?S.list.filter(o=>o.cat==='free'):S.list; }
+function groupStats(L){ const g={apps:0,inst:0,mw:0,cr:0}; L.forEach(o=>{g.apps+=o.apps||0;g.inst+=o.inst;g.mw+=o.mw||0;g.cr+=o.cr||0;}); g.conv=g.apps?g.inst/g.apps*100:0; g.kw=g.inst?g.mw*1000/g.inst:0; return g; }
+const GNAME=()=>scope==='free'?'free power states':'India';
 
 function drawTop(){
   const L=scoped(); if(!L.length){ $('#topbars').innerHTML='<div class="line2">No states to show.</div>'; return; }
@@ -844,7 +867,8 @@ function tipify(sel){ const tip=$('#tip'); document.querySelectorAll(sel).forEac
 function countUp(){ document.querySelectorAll('[data-count]').forEach(el=>{const to=+el.dataset.count; if(reduce){el.textContent=fmt(to);return;}
   const t0=performance.now(); const step=t=>{const p=Math.min(1,(t-t0)/1100); el.textContent=fmt(to*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step);}; requestAnimationFrame(step);}); }
 
-document.querySelectorAll('.pills button').forEach(b=>b.onclick=()=>{ scope=b.dataset.scope; document.querySelectorAll('.pills button').forEach(x=>x.classList.toggle('on',x===b)); band='all'; if(S){ drawTop(); drawBands(); drawTable(); setTimeout(()=>document.querySelectorAll('#topbars [data-w]').forEach(e=>e.style.width=e.dataset.w),30);} });
+function setScope(sc){ scope=sc; document.querySelectorAll('.pills button').forEach(x=>x.classList.toggle('on',x.dataset.scope===sc)); band='all'; if(S){ render(); window.scrollTo({top:0,behavior:'smooth'}); } }
+document.querySelectorAll('.pills button').forEach(b=>b.onclick=()=>setScope(b.dataset.scope));
 
 /* ============================ force update ============================ */
 const fm=$('#fm'), fMsg=$('#fMsg');
