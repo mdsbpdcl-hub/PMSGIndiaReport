@@ -488,7 +488,7 @@ const IC={
 /* ============================ render ============================ */
 function render(){
   const {list,T,fr}=S; const me=list.find(isMe);
-  $('#ason').textContent='As on '+S.asOn+(S.live?'':' · saved copy, latest figures could not be loaded');
+  $('#ason').textContent='As on '+S.asOn;
   if(!me){ $('#app').innerHTML='<div class="state"><div class="card"><b>No data yet</b><div class="line2">Bihar figures are not in the latest data.</div></div></div>'; return; }
   const F=scope==='free', L=scoped(), G=groupStats(L), r=L.indexOf(me)+1;
   const next=L[r-2], prev=L[r];
