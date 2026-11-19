@@ -76,6 +76,9 @@ header{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.88);backdro
 .fact .x{font-size:18px;font-weight:700;margin-top:3px;overflow-wrap:anywhere}
 /* bars */
 .hbars{display:flex;flex-direction:column;gap:7px}
+#topbars{gap:4px;max-height:640px;overflow-y:auto;padding-right:4px}
+#topbars .hb{font-size:12.5px}
+#topbars .hb .tr{height:10px}
 .hb{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr) minmax(0,80px);gap:10px;align-items:center;font-size:13px;cursor:pointer;border-radius:6px;padding:2px 4px}
 .hb:hover{background:var(--line2)}
 .hb .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -574,7 +577,7 @@ function render(){
   </section>
 
   <section class="grid two sec">
-    <div class="card"><h2>Installations – top states and Bihar</h2><div class="sub">Tap a state to see its details</div><div class="hbars" id="topbars"></div></div>
+    <div class="card"><h2 id="topH">Installations – all states</h2><div class="sub">All states in this view, by installations. Tap a state to see its details.</div><div class="hbars" id="topbars"></div></div>
     <div class="card"><h2>How many applications turn into installations</h2><div class="sub">Share of applications installed</div><div class="cmp" id="cmp"></div></div>
   </section>
 
@@ -902,10 +905,9 @@ const GNAME=()=>scope==='free'?'free power states':'India';
 
 function drawTop(){
   const L=scoped(); if(!L.length){ $('#topbars').innerHTML='<div class="line2">No states to show.</div>'; return; }
-  const me=L.find(isMe); const top=L.slice(0,10); const max=L[0].inst||1;
-  let rows=top.map((o,i)=>hbar(o,i+1,max));
-  if(me&&!top.includes(me)) rows.push('<div class="gap"></div>'+hbar(me,L.indexOf(me)+1,max));
-  $('#topbars').innerHTML=rows.join('');
+  $('#topH').textContent=scope==='free'?`Installations – all ${L.length} free power states`:`Installations – all ${L.length} states and UTs`;
+  const max=L[0].inst||1;
+  $('#topbars').innerHTML=L.map((o,i)=>hbar(o,i+1,max)).join('');
   $('#topbars').querySelectorAll('[data-s]').forEach(e=>e.onclick=()=>openDrawer(e.dataset.s));
 }
 function hbar(o,r,max){ return `<div class="hb ${isMe(o)?'me':''}" data-s="${esc(o.state)}" title="${esc(o.state)}: ${fmt(o.inst)}"><div class="n">${r}. ${esc(o.state)}</div><div class="tr"><div class="f" data-w="${Math.max(.6,o.inst/max*100)}%"></div></div><div class="val">${lakh(o.inst)}</div></div>`; }
