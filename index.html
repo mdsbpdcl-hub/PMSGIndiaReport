@@ -285,6 +285,35 @@ th .ar{color:var(--hi)}
 .bt .mk2 span{color:var(--base2);top:auto;bottom:-18px}
 .pills button[data-scope=free].on{background:var(--hi);color:#fff}
 .rankbox .chip{white-space:normal;line-height:1.35;padding:3px 9px}
+
+:root{--nb:#eb6834;--sb:#2a78d6;--nbT:#fff1ea;--sbT:#ebf3fd}
+.bihsec{background:linear-gradient(180deg,#f6f9ff,#fff 170px)}
+.fbadge.bb{background:#eaf2fd;border-color:#cfe0f7;color:var(--sb);font-weight:800;font-size:13px}
+.h3{font-size:14px;margin:0;font-weight:650}
+.dcards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+@media(max-width:980px){.dcards{grid-template-columns:minmax(0,1fr)}}
+.dc{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px 16px;position:relative;overflow:hidden;min-width:0}
+.dc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--dcol)}
+.dc .dn{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px}
+.dc .dn .tag{font-size:11px;font-weight:700;color:#fff;background:var(--dcol);border-radius:6px;padding:2px 7px}
+.dc .dn small{font-weight:500;color:var(--muted);font-size:12px}
+.dc .dv{font-size:26px;font-weight:700;margin-top:6px;line-height:1.1}
+.dc .dv small{font-size:13px;color:var(--muted);font-weight:500}
+.dc .dg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:10px;border-top:1px solid var(--line2);padding-top:10px}
+.dc .dg .pl{font-size:11px;color:var(--faint)} .dc .dg .pv{font-size:14px;font-weight:700}
+.dc .cbar{position:relative;height:7px;background:var(--track);border-radius:4px;margin-top:10px}
+.dc .cbar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--dcol)}
+.dc .cbar s{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ref)}
+.dc .cx{font-size:12px;color:var(--muted);margin-top:6px}
+.dc.month{--dcol:#0f8a7e;background:linear-gradient(180deg,#f0faf8,#fff)}
+.dleg{display:flex;gap:14px;font-size:12px;color:var(--muted);margin:-2px 0 8px}
+.dleg span{display:inline-flex;align-items:center;gap:6px}.dleg i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.hb.nb .f{background:var(--nb)} .hb.sb .f{background:var(--sb)}
+.linkb{border:0;background:none;color:var(--sb);font-weight:600;font-size:13px;cursor:pointer;padding:8px 4px 0}
+#dtbl{min-width:900px}
+#bihsec .tbox{max-height:520px;overflow:auto}
+#dtbl td:nth-child(3){white-space:nowrap;min-width:0;max-width:none;font-size:12.5px}
+.dtag{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;color:#fff}
 @media(max-width:640px){#fseg{display:none}}
 @media(max-width:600px){.strip .tl.odd{display:none}.tile .fz{display:none}.tmap{gap:3px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -345,6 +374,8 @@ const WEBAPP_URL = '';   // optional: update-service link; if empty it is read f
 /* Last known figures (used only if the live figures cannot be reached) */
 const SNAPSHOT = {asOn:'18 Nov 2026', rows:
 [["Rank","State/UT","Free Electricity (Domestic)","Applications","Installations","Conversion %","Capacity (MW)","Avg System (kW)","Subsidy Released (Rs Cr)"],["1","Uttar Pradesh","No","1411359","970710","68.8","3250","3.34","6517"],["2","Gujarat","No","1303461","942163","72.3","3540","3.75","6827"],["3","Maharashtra","No","1315641","921504","70.0","3360","3.64","6458"],["4","Andhra Pradesh","No","1098671","537374","48.9","1460","2.72","2846"],["5","Kerala","No","540576","417113","77.2","1610","3.87","2663"],["6","Rajasthan","Linked to rooftop solar - 150 units/month after 1.1 kW RTS","531290","374410","70.5","1460","3.91","2512"],["7","Odisha","No","450596","292385","64.9","636.6","2.18","1285"],["8","Assam","No","438133","209482","47.8","691.7","3.30","1560"],["9","Madhya Pradesh","No","272428","205524","75.4","770.9","3.75","1430"],["10","Haryana","No","242561","165752","68.3","563.6","3.40","1030"],["11","Chhattisgarh","No","260711","133710","51.3","471.7","3.53","801"],["12","Uttarakhand","No","163423","121248","74.2","434.7","3.59","952"],["13","Tamil Nadu","Yes - 200 units per 2 months (use up to 500 units); others 100 units","144287","119147","82.6","438.1","3.68","753"],["14","Telangana","Yes - 200 units/month (Gruha Jyothi, eligible families)","112318","75714","67.4","279.2","3.69","477"],["15","Bihar","Yes - 125 units/month (all domestic, from Aug-2025)","416555","63462","15.2","166.3","2.62","283"],["16","Jammu and Kashmir","Linked to rooftop solar - 200 units/month for AAY families (rolling out)","99964","50760","50.8","181.9","3.58","374"],["17","Karnataka","Yes - up to 200 units/month (Gruha Jyothi)","44045","29129","66.1","121.8","4.18","200"],["18","Punjab","Yes - 300 units/month (domestic)","29496","21931","74.4","100.7","4.59","144"],["19","Himachal Pradesh","Yes - 125 units/month (non-taxpayers, max 2 meters)","22519","16430","73.0","56.1","3.41","117"],["20","NCT of Delhi","Yes - 200 units/month; 50% subsidy 201-400 units","71251","15387","21.6","66.3","4.31","104"],["21","West Bengal","Targeted - up to 75 units/month for poor (Hasir Alo); check current status","95267","13850","14.5","47.9","3.46","55.4"],["22","Puducherry","No","8732","7027","80.5","25.5","3.63","45.7"],["23","Tripura","No","8598","5934","69.0","20.3","3.43","44.2"],["24","Jharkhand","Yes - 200 units/month (consumption up to 200 units)","10808","4683","43.3","20.1","4.30","29.4"],["25","Goa","No","5505","4371","79.4","36.1","8.27","29.0"],["26","Ladakh","No","4222","2831","67.1","9.2","3.25","20.6"],["27","Dadra and Nagar Haveli and Daman and Diu","No","5393","2550","47.3","4.7","1.86","9.20"],["28","Manipur","No","4640","2357","50.8","8.9","3.78","16.7"],["29","Chandigarh","No","2260","2019","89.3","9.5","4.72","9.19"],["30","Mizoram","No","1870","1735","92.8","7.1","4.11","13.3"],["31","Lakshadweep","No","1647","1427","86.6","4.8","3.35","11.4"],["32","Nagaland","No","1215","742","61.1","2.5","3.35","4.97"],["33","Andaman and Nicobar Islands","No","1136","695","61.2","2.3","3.27","4.80"],["34","Meghalaya","No","513","77","15.0","0.25","3.24","0.454"],["35","Sikkim","No","130","68","52.3","0.227","3.33","0.462"],["36","Arunachal Pradesh","No","184","4","2.2","0.02","5.08","0.00858"]]};
+
+const BIH_SNAP = {"month":"NOV-26","dist":[["Rank","District","DISCOM","Applications","Installations","Installed %","Capacity (MW)","Avg System (kW)","Subsidy (Rs Cr)","Installations added since last update"],[1,"Patna","SBPDCL",22675,12876,56.8,48.36,3.76,86.61,""],[2,"Saran","NBPDCL",8850,4757,53.8,7.93,1.67,15.54,""],[3,"Supaul","NBPDCL",28598,4441,15.5,6.56,1.48,11.5,""],[4,"Muzaffarpur","NBPDCL",11272,3384,30.0,10.98,3.24,18.5,""],[5,"Vaishali","NBPDCL",23654,2951,12.5,6.74,2.28,9.54,""],[6,"Purbi Champaran","NBPDCL",11234,2529,22.5,5.12,2.02,9.78,""],[7,"Buxar","SBPDCL",5710,2336,40.9,3.29,1.41,7.72,""],[8,"Nalanda","SBPDCL",8435,2100,24.9,7.04,3.35,13.45,""],[9,"Pashchim Champaran","NBPDCL",11905,1758,14.8,4.26,2.42,6.87,""],[10,"Sheohar","NBPDCL",3729,1744,46.8,2.4,1.38,4.86,""],[11,"Jehanabad","SBPDCL",8475,1647,19.4,2.63,1.6,5.04,""],[12,"Samastipur","NBPDCL",15371,1575,10.2,4.72,3.0,7.64,""],[13,"Bhagalpur","SBPDCL",7150,1572,22.0,5.67,3.61,10.26,""],[14,"Sheikhpura","SBPDCL",6263,1421,22.7,2.03,1.43,2.38,""],[15,"Gaya","SBPDCL",8710,1363,15.6,4.97,3.65,8.85,""],[16,"Sitamarhi","NBPDCL",8872,1339,15.1,3.74,2.79,6.82,""],[17,"Saharsa","NBPDCL",14173,1266,8.9,1.99,1.57,3.32,""],[18,"Kaimur Bhabua","SBPDCL",10103,1244,12.3,2.43,1.95,3.87,""],[19,"Begusarai","NBPDCL",10766,1181,11.0,3.24,2.74,5.05,""],[20,"Bhojpur","SBPDCL",11452,1179,10.3,2.81,2.38,5.14,""],[21,"Khagaria","NBPDCL",9391,1149,12.2,2.83,2.46,3.53,""],[22,"Darbhanga","NBPDCL",12007,1075,9.0,3.32,3.09,5.51,""],[23,"Siwan","NBPDCL",9458,899,9.5,1.83,2.04,1.89,""],[24,"Lakhisarai","SBPDCL",5731,759,13.2,1.16,1.53,1.16,""],[25,"Jamui","SBPDCL",10431,754,7.2,1.37,1.82,1.34,""],[26,"Nawada","SBPDCL",2674,706,26.4,2.48,3.51,4.47,""],[27,"Madhepura","NBPDCL",10450,662,6.3,1.6,2.42,1.83,""],[28,"Gopalganj","NBPDCL",9980,658,6.6,1.36,2.07,1.53,""],[29,"Rohtas","SBPDCL",9895,630,6.4,2.2,3.49,3.71,""],[30,"Madhubani","NBPDCL",11652,592,5.1,1.53,2.58,2.0,""],[31,"Purnia","NBPDCL",22563,535,2.4,1.98,3.7,2.86,""],[32,"Munger","SBPDCL",8385,491,5.9,1.68,3.42,2.98,""],[33,"Araria","NBPDCL",8690,414,4.8,1.05,2.54,0.96,""],[34,"Katihar","NBPDCL",27547,392,1.4,1.36,3.47,1.5,""],[35,"Aurangabad","SBPDCL",6330,332,5.2,1.25,3.77,1.89,""],[36,"Banka","SBPDCL",1968,300,15.2,1.02,3.4,1.46,""],[37,"Kishanganj","NBPDCL",8641,263,3.0,0.77,2.93,1.02,""],[38,"Arwal","SBPDCL",3365,188,5.6,0.62,3.3,1.02,""]],"sum":[["Name","Applications","Installations","Households","Capacity (MW)","Subsidy (Rs Cr)","Applications this month","Installations this month","Vendors"],["NBPDCL",279213,33565,33617,75.32,122.03,"","",""],["SBPDCL",137432,29902,30480,91.03,161.31,"","",""],["Bihar",416555,63462,64092,166.32,283.45,19391,1998,4],["India",9121405,5733705,6760688,19858.36,37626.27,262564,168372,""]]};
 
 /* ============================ helpers ============================ */
 const $ = s => document.querySelector(s);
@@ -408,13 +439,15 @@ async function load(){
     let rows; try{ rows=await getRows('State-wise'); build(rows);}catch(e){ rows=await getRows(''); }
     const d=build(rows); d.live=true;
     try{ d.hist=histFrom(await getRows('History')); }catch(e){ d.hist=null; }
+    try{ let sm=null; try{ sm=await getRows('Bihar Summary'); }catch(e){} d.bih=bihFrom(await getRows('Bihar Districts'),sm); }catch(e){ d.bih=null; }
     S=d;
   }catch(e){
-    if(SNAPSHOT&&SNAPSHOT.rows){ S=build(SNAPSHOT.rows); S.asOn=S.asOn||SNAPSHOT.asOn; S.live=false; S.hist=null; }
+    if(SNAPSHOT&&SNAPSHOT.rows){ S=build(SNAPSHOT.rows); S.asOn=S.asOn||SNAPSHOT.asOn; S.live=false; S.hist=null; S.bih=null; }
     else { showState('error'); return; }
   }
   if(!S.list.length){ showState('empty'); return; }
   if(!S.asOn) S.asOn=SNAPSHOT.asOn;
+  if(!S.bih){ try{ S.bih=bihFrom(BIH_SNAP.dist,BIH_SNAP.sum); S.bih.month=S.bih.month||BIH_SNAP.month; }catch(e){ S.bih=null; } }
   render();
 }
 function histFrom(rows){
@@ -497,6 +530,20 @@ function render(){
     <div class="fgrid" id="fgrid"></div>
   </section>
 
+  <section class="card sec bihsec" id="bihsec">
+    <div class="hdr"><div class="sech"><span class="fbadge bb">BR</span><div><h2>Bihar in detail – districts and DISCOMs</h2><div class="sub" style="margin:0">District-wise rooftop solar progress in Bihar, North (NBPDCL) and South (SBPDCL)</div></div></div>
+      <button class="refresh pdfb" id="pdfBih" title="Export PDF"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14l3 3 3-3"/></svg><span>Export PDF</span></button></div>
+    <div class="dcards" id="dcards"></div>
+    <div class="grid two" style="margin-top:16px">
+      <div><div class="hdr" style="margin-bottom:10px"><h3 class="h3">Districts</h3><div class="seg" id="dmode"><button class="on" data-d="inst">Installations</button><button data-d="conv">% installed</button><button data-d="pend">Waiting</button></div></div>
+        <div class="dleg"><span><i style="background:var(--nb)"></i>NBPDCL</span><span><i style="background:var(--sb)"></i>SBPDCL</span></div>
+        <div class="hbars" id="dbars"></div><button class="linkb" id="dmore"></button></div>
+      <div><h3 class="h3">What the district figures say</h3><div class="ins" id="dins"></div></div>
+    </div>
+    <div class="tools" style="margin-top:16px"><input id="dq" placeholder="Search a district" aria-label="Search a district"><div class="bands" id="dfil"></div></div>
+    <div class="tbox"><table id="dtbl"></table></div>
+  </section>
+
   <section class="grid facts sec">
     ${F?fact('Rank in India (installations)',ord(me.rank)+' of '+list.length):fact('Rank among free power states',me.frank?ord(me.frank)+' of '+fr.length:'–')}
     ${fact('Rank in applications',ord(rankIn('apps'))+' of '+L.length)}
@@ -546,10 +593,11 @@ function render(){
     <div class="tbox"><table id="tbl"></table></div>
   </section>`;
 
-  drawFreeSec(); drawMap(); drawLadder(); drawStrip(); drawTop(); drawCmp(); drawInsights(me,list[me.rank-2],list[me.rank],Math.round(me.apps*T.conv/100),list.filter(o=>o!==me&&o.inst>Math.round(me.apps*T.conv/100)).length+1); drawTrend(); drawBands(); drawTable();
+  drawFreeSec(); drawBihar(); drawMap(); drawLadder(); drawStrip(); drawTop(); drawCmp(); drawInsights(me,list[me.rank-2],list[me.rank],Math.round(me.apps*T.conv/100),list.filter(o=>o!==me&&o.inst>Math.round(me.apps*T.conv/100)).length+1); drawTrend(); drawBands(); drawTable();
   countUp(); setTimeout(()=>{document.querySelectorAll('[data-w]').forEach(e=>e.style.width=e.dataset.w); document.querySelectorAll('[data-h]').forEach(e=>e.style.height=e.dataset.h);},60);
   $('#q').addEventListener('input',e=>{query=e.target.value;drawTable();});
   const sbl=document.querySelector('.sb-link'); if(sbl) sbl.onclick=()=>setScope('all');
+  if($('#pdfBih')) $('#pdfBih').onclick=()=>withBtn('pdfBih',exportBihPDF);
   $('#pdfFree').onclick=()=>withBtn('pdfFree',exportFreePDF); $('#pdfAll').onclick=()=>withBtn('pdfAll',exportAllPDF);
 }
 
@@ -687,6 +735,118 @@ async function exportFreePDF(){
       if(String(row[1]).toLowerCase().includes(HOME)){ d.cell.styles.fillColor=C.hiT; if(d.column.index<2) d.cell.styles.textColor=C.hi; }
       if(d.column.index===11){ d.cell.styles.textColor=stCol(row[11]); d.cell.styles.fontStyle='bold'; } }});
   doc.save(`PMSG_Free_Electricity_States_${fileDate()}.pdf`);
+}
+
+/* ============================ Bihar districts ============================ */
+function bihFrom(rows,sumRows){
+  const hd=rows[0].map(x=>String(x).toLowerCase().trim()); const fi=(re,not)=>hd.findIndex(x=>re.test(x)&&!(not&&not.test(x)));
+  const I={name:fi(/district/),disc:fi(/discom/),apps:fi(/applica/),inst:fi(/install/,/added|since|%/),mw:fi(/capacity/),cr:fi(/subsidy/),add:fi(/added|since/)};
+  if(I.name<0||I.inst<0) throw new Error('cols');
+  const ds=rows.slice(1).map(r=>{const o={name:String(r[I.name]||'').trim(),discom:String(r[I.disc]||'').trim().toUpperCase(),apps:num(r[I.apps]),inst:num(r[I.inst]),mw:num(r[I.mw]),cr:num(r[I.cr]),add:I.add>=0?num(r[I.add]):null};
+    o.conv=o.apps?o.inst/o.apps*100:null; o.kw=(o.mw&&o.inst)?o.mw*1000/o.inst:null; o.pend=o.apps!=null?Math.max(0,o.apps-o.inst):null; return o;}).filter(o=>o.name&&o.inst!=null);
+  ds.sort((a,b)=>b.inst-a.inst); ds.forEach((o,i)=>o.rank=i+1);
+  const sum={}; let month='';
+  if(sumRows&&sumRows.length>1){ const sh=sumRows[0].map(x=>String(x).toLowerCase()); const g=re=>sh.findIndex(x=>re.test(x));
+    const J={n:g(/^name/),apps:g(/^applications$/),inst:g(/^installations$/),hh:g(/household/),mw:g(/capacity/),cr:g(/subsidy/),ma:g(/applications this month/),mi:g(/installations this month/),v:g(/vendor/)};
+    sumRows.slice(1).forEach(r=>{ const n=String(r[J.n]||'').trim(); if(n) sum[n.toUpperCase()]={apps:num(r[J.apps]),inst:num(r[J.inst]),hh:num(r[J.hh]),mw:num(r[J.mw]),cr:num(r[J.cr]),ma:num(r[J.ma]),mi:num(r[J.mi]),v:num(r[J.v])}; });
+    sumRows.forEach(r=>{const i=r.findIndex(c=>String(c).trim().toLowerCase()==='month'); if(i>=0&&r[i+1]) month=String(r[i+1]).trim();}); }
+  const dsum=k=>{const g=ds.filter(o=>o.discom===k); const a=g.reduce((s,o)=>s+(o.apps||0),0), i=g.reduce((s,o)=>s+o.inst,0), m=g.reduce((s,o)=>s+(o.mw||0),0), c=g.reduce((s,o)=>s+(o.cr||0),0); return {apps:a,inst:i,mw:m,cr:c,n:g.length};};
+  ['NBPDCL','SBPDCL'].forEach(k=>{ const d=dsum(k); sum[k]=Object.assign({},d,sum[k]||{}); sum[k].n=d.n; });
+  if(!sum.BIHAR){ const a=ds.reduce((s,o)=>s+(o.apps||0),0), i=ds.reduce((s,o)=>s+o.inst,0); sum.BIHAR={apps:a,inst:i,mw:ds.reduce((s,o)=>s+(o.mw||0),0),cr:ds.reduce((s,o)=>s+(o.cr||0),0)}; }
+  Object.values(sum).forEach(o=>{ o.conv=o.apps?o.inst/o.apps*100:null; });
+  return {ds,sum,month};
+}
+const monthName=t=>{ if(!t) return 'this month'; const M={JAN:'January',FEB:'February',MAR:'March',APR:'April',MAY:'May',JUN:'June',JUL:'July',AUG:'August',SEP:'September',OCT:'October',NOV:'November',DEC:'December'}; const p=String(t).split('-'); return (M[p[0]]||p[0])+(p[1]?' 20'+p[1]:''); };
+let dMode='inst', dFilter='all', dAll=false, dSort='inst', dDir=-1, dQuery='';
+function dStatus(o,B){ if(o.conv==null||B.conv==null) return {c:'',t:'–'}; const d=o.conv-B.conv; return d>=5?{c:'g',t:'Ahead'}:d<=-5?{c:'r',t:'Behind'}:{c:'a',t:'Near average'}; }
+function drawBihar(){
+  const sec=$('#bihsec'); if(!S.bih){ if(sec) sec.style.display='none'; return; }
+  const {ds,sum,month}=S.bih, B=sum.BIHAR, IN=sum.INDIA;
+  const card=(k,full,col)=>{ const o=sum[k]; if(!o) return ''; const sh=B.inst?o.inst/B.inst*100:0;
+    return `<div class="dc" style="--dcol:${col}"><div class="dn"><span class="tag">${k}</span>${full} <small>· ${o.n||''} districts</small></div>
+      <div class="dv">${fmt(o.inst)} <small>installations · ${f1(sh)}% of Bihar</small></div>
+      <div class="cbar" title="Share of applications installed; line = Bihar ${f1(B.conv)}%"><i style="width:${Math.min(100,o.conv||0)}%"></i><s style="left:${B.conv}%"></s></div>
+      <div class="cx"><b>${f1(o.conv)}%</b> of applications installed · Bihar ${f1(B.conv)}%</div>
+      <div class="dg"><div><div class="pl">Applications</div><div class="pv">${fmt(o.apps)}</div></div><div><div class="pl">Capacity</div><div class="pv">${f1(o.mw)} MW</div></div><div><div class="pl">Subsidy</div><div class="pv">₹${f1(o.cr)} cr</div></div></div></div>`; };
+  const mi=B.mi, ma=B.ma;
+  const mcard=mi!=null&&!isNaN(mi)?`<div class="dc month"><div class="dn"><span class="tag">${esc(monthName(month).split(' ')[0].slice(0,3).toUpperCase())}</span>Added in ${esc(monthName(month))}</div>
+      <div class="dv">+${fmt(mi)} <small>installations in Bihar</small></div>
+      <div class="cx">+${fmt(ma)} new applications this month</div>
+      <div class="dg"><div><div class="pl">Share of India's additions</div><div class="pv">${IN&&IN.mi?f2(mi/IN.mi*100)+'%':'–'}</div></div><div><div class="pl">India added</div><div class="pv">+${IN?fmt(IN.mi):'–'}</div></div><div><div class="pl">Households</div><div class="pv">${B.hh?fmt(B.hh):'–'}</div></div></div></div>`:'';
+  $('#dcards').innerHTML=card('NBPDCL','North Bihar','var(--nb)')+card('SBPDCL','South Bihar','var(--sb)')+mcard;
+  drawDBars(); drawDIns(); drawDFil(); drawDTable();
+  $('#dmode').onclick=e=>{const b=e.target.closest('button'); if(!b) return; dMode=b.dataset.d; $('#dmode').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); drawDBars();};
+  $('#dmode').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.d===dMode));
+  $('#dmore').onclick=()=>{dAll=!dAll; drawDBars();};
+  $('#dq').value=dQuery; $('#dq').oninput=e=>{dQuery=e.target.value; drawDTable();};
+}
+function dScoped(){ return S.bih.ds.filter(o=>dFilter==='all'||o.discom===dFilter); }
+function drawDBars(){
+  let L=dScoped().slice(); const v=o=>dMode==='inst'?o.inst:dMode==='conv'?o.conv:o.pend;
+  if(dMode==='conv') L=L.filter(o=>(o.apps||0)>=500);
+  L.sort((a,b)=>(v(b)??-1)-(v(a)??-1)); const n=L.length, show=dAll?L:L.slice(0,12); const max=dMode==='conv'?100:Math.max(1,...L.map(v));
+  $('#dbars').innerHTML=show.map((o,i)=>`<div class="hb ${o.discom==='SBPDCL'?'sb':'nb'}" title="${esc(o.name)} (${o.discom}): ${fmt(o.inst)} installed of ${fmt(o.apps)} applications, ${f1(o.conv)}%"><div class="n">${i+1}. ${esc(o.name)}</div><div class="tr"><div class="f" data-w="${Math.max(.6,(v(o)||0)/max*100)}%"></div></div><div class="val">${dMode==='conv'?f1(v(o))+'%':lakh(v(o))}</div></div>`).join('')
+    +(dMode==='conv'?'<div class="line2" style="font-size:12px;margin-top:4px">Districts with 500 or more applications.</div>':'');
+  $('#dmore').textContent=n>12?(dAll?'Show top 12 only':`Show all ${n} districts`):''; $('#dmore').style.display=n>12?'':'none';
+  setTimeout(()=>document.querySelectorAll('#dbars [data-w]').forEach(e=>e.style.width=e.dataset.w),30);
+}
+function drawDIns(){
+  const {ds,sum}=S.bih, B=sum.BIHAR, big=ds.filter(o=>(o.apps||0)>=1000);
+  const top=ds[0], best=big.slice().sort((a,b)=>b.conv-a.conv)[0], worst=big.slice().sort((a,b)=>a.conv-b.conv)[0], wait=ds.slice().sort((a,b)=>b.pend-a.pend)[0];
+  const top5=ds.slice(0,5).reduce((s,o)=>s+o.inst,0)/B.inst*100;
+  const N=sum.NBPDCL, So=sum.SBPDCL, behind=ds.filter(o=>dStatus(o,B).t==='Behind').length;
+  const add=ds.filter(o=>o.add!=null&&!isNaN(o.add)), addT=add.reduce((s,o)=>s+o.add,0), addTop=add.slice().sort((a,b)=>b.add-a.add)[0];
+  const out=[
+    ['Leading district',`<b>${esc(top.name)}</b> has <b>${fmt(top.inst)}</b> installations – <b>${f1(top.inst/B.inst*100)}%</b> of Bihar. The top five districts hold <b>${f1(top5)}%</b>.`],
+    ['North and South',`NBPDCL has <b>${fmt(N.apps)}</b> applications and <b>${f1(N.conv)}%</b> installed; SBPDCL has <b>${fmt(So.apps)}</b> applications and <b>${f1(So.conv)}%</b> installed.`],
+    ['Highest share installed',best?`<b>${esc(best.name)}</b> (${best.discom}) has installed <b>${f1(best.conv)}%</b> of its applications.`:''],
+    ['Lowest share installed',worst?`<b>${esc(worst.name)}</b> (${worst.discom}) has installed <b>${f1(worst.conv)}%</b> of its ${fmt(worst.apps)} applications.`:''],
+    ['Most applications waiting',`<b>${esc(wait.name)}</b> (${wait.discom}) has <b>${fmt(wait.pend)}</b> applications not yet installed.`],
+    ['Below the Bihar average',`<b>${behind}</b> of ${ds.length} districts are 5 points or more below Bihar's ${f1(B.conv)}%.`]
+  ];
+  if(add.length&&addT) out.splice(1,0,['Since the last update',`Bihar districts added <b>${fmt(addT)}</b> installations; most in <b>${esc(addTop.name)}</b> (+${fmt(addTop.add)}).`]);
+  $('#dins').innerHTML=out.filter(x=>x[1]).map(([h,t])=>`<div class="in"><div class="h">${h}</div>${t}</div>`).join('');
+}
+function drawDFil(){
+  const c=k=>k==='all'?S.bih.ds.length:S.bih.ds.filter(o=>o.discom===k).length;
+  $('#dfil').innerHTML=[['all','All districts'],['NBPDCL','NBPDCL'],['SBPDCL','SBPDCL']].map(([k,t])=>`<button class="${dFilter===k?'on':''}" data-k="${k}">${t} (${c(k)})</button>`).join('');
+  $('#dfil').onclick=e=>{const b=e.target.closest('button'); if(!b) return; dFilter=b.dataset.k; drawDFil(); drawDBars(); drawDTable();};
+}
+const DCOLS=[['rank','Rank'],['name','District'],['discom','DISCOM'],['apps','Applications'],['inst','Installations'],['conv','Installed %'],['status','vs Bihar'],['pend','Waiting'],['mw','Capacity (MW)'],['kw','Avg kW'],['cr','Subsidy (₹ cr)'],['add','Added since last update']];
+function drawDTable(){
+  const B=S.bih.sum.BIHAR; let L=dScoped(); if(dQuery) L=L.filter(o=>o.name.toLowerCase().includes(dQuery.toLowerCase()));
+  const val=(o,k)=>k==='status'?dStatus(o,B).t:o[k];
+  L=L.slice().sort((a,b)=>{const x=val(a,dSort),y=val(b,dSort); if(typeof x==='string'||typeof y==='string') return dDir*String(x).localeCompare(String(y)); return dDir*((x??-1e18)-(y??-1e18));});
+  const head=`<thead><tr>${DCOLS.map(([k,t])=>`<th data-k="${k}">${t}${dSort===k?` <span class="ar">${dDir>0?'▲':'▼'}</span>`:''}</th>`).join('')}</tr></thead>`;
+  const body=L.map(o=>{const st=dStatus(o,B); return `<tr><td>${o.rank}</td><td>${esc(o.name)}</td><td><span class="dtag" style="background:${o.discom==='SBPDCL'?'var(--sb)':'var(--nb)'}">${o.discom}</span></td><td>${fmt(o.apps)}</td><td>${fmt(o.inst)}</td><td>${f1(o.conv)}</td><td style="text-align:left"><span class="chip ${st.c}"><i></i>${st.t}</span></td><td>${fmt(o.pend)}</td><td>${f2(o.mw)}</td><td>${f2(o.kw)}</td><td>${f2(o.cr)}</td><td>${o.add==null||isNaN(o.add)?'–':(o.add>=0?'+':'')+fmt(o.add)}</td></tr>`;}).join('');
+  const g=L.reduce((s,o)=>{s.a+=o.apps||0;s.i+=o.inst;s.m+=o.mw||0;s.c+=o.cr||0;return s;},{a:0,i:0,m:0,c:0});
+  const tot=!dQuery?`<tr class="tot"><td></td><td>${dFilter==='all'?'Bihar':dFilter}</td><td></td><td>${fmt(g.a)}</td><td>${fmt(g.i)}</td><td>${f1(g.a?g.i/g.a*100:0)}</td><td></td><td>${fmt(g.a-g.i)}</td><td>${f2(g.m)}</td><td>${f2(g.i?g.m*1000/g.i:0)}</td><td>${f2(g.c)}</td><td></td></tr>`:'';
+  $('#dtbl').innerHTML=head+`<tbody>${body}${tot}</tbody>`;
+  $('#dtbl thead').onclick=e=>{const th=e.target.closest('th'); if(!th) return; const k=th.dataset.k; if(dSort===k) dDir*=-1; else {dSort=k; dDir=['name','discom','status','rank'].includes(k)?1:-1;} drawDTable();};
+}
+async function exportBihPDF(){
+  const Jp=await pdfLib(); const doc=new Jp({orientation:'landscape',unit:'mm',format:'a4'}); const {ds,sum,month}=S.bih, B=sum.BIHAR, N=sum.NBPDCL, So=sum.SBPDCL;
+  let y=pdfHead(doc,'Bihar - district-wise rooftop solar progress (PM Surya Ghar)',`${ds.length} districts, ranked by installations   |   NBPDCL ${N.n} districts, SBPDCL ${So.n} districts`);
+  const me=S.list.find(isMe);
+  y=pdfBoxes(doc,y,[{l:'Bihar installations',v:fmt(B.inst),s:me?`${ord(me.rank)} of ${S.list.length} in India`:'',hi:1},{l:'Bihar applications',v:fmt(B.apps),s:`${f1(B.conv)}% installed`},
+    {l:'NBPDCL installations',v:fmt(N.inst),s:`${f1(N.conv)}% of ${fmt(N.apps)} installed`},{l:'SBPDCL installations',v:fmt(So.inst),s:`${f1(So.conv)}% of ${fmt(So.apps)} installed`},
+    {l:'Added in '+P(monthName(month)),v:B.mi!=null&&!isNaN(B.mi)?'+'+fmt(B.mi):'-',s:B.ma!=null&&!isNaN(B.ma)?`+${fmt(B.ma)} applications`:''}]);
+  const sb=[['NBPDCL',N],['SBPDCL',So],['Bihar',B]].map(([n,o])=>[n,fmt(o.apps),fmt(o.inst),f1(o.conv),fmt((o.apps||0)-(o.inst||0)),f1(o.mw),f2(o.cr)]);
+  doc.autoTable({head:[['DISCOM','Applications','Installations','Installed %','Waiting','Capacity (MW)','Subsidy (Rs cr)']],body:sb,startY:y,theme:'grid',margin:{left:14,right:14},
+    styles:{fontSize:8.5,cellPadding:1.7,lineColor:C.line,lineWidth:.15,textColor:C.ink,halign:'right'},headStyles:{fillColor:C.head,textColor:C.muted,fontStyle:'bold',halign:'right'},
+    columnStyles:{0:{halign:'left',fontStyle:'bold',cellWidth:40}},
+    didParseCell:d=>{ if(d.section==='head'&&d.column.index===0) d.cell.styles.halign='left'; if(d.section==='body'){ const n=sb[d.row.index][0]; if(d.column.index===0) d.cell.styles.textColor=n==='NBPDCL'?[235,104,52]:n==='SBPDCL'?[42,120,214]:C.ink; if(n==='Bihar'){ d.cell.styles.fillColor=C.head; d.cell.styles.fontStyle='bold'; } } }});
+  const head=[['Rank','District','DISCOM','Applications','Installations','Installed %','vs Bihar','Waiting','Capacity (MW)','Avg kW','Subsidy (Rs cr)','Added']];
+  const body=ds.map(o=>[o.rank,P(o.name),o.discom,fmt(o.apps),fmt(o.inst),f1(o.conv),dStatus(o,B).t,fmt(o.pend),f2(o.mw),f2(o.kw),f2(o.cr),o.add==null||isNaN(o.add)?'-':(o.add>=0?'+':'')+fmt(o.add)]);
+  body.push(['','Bihar (total)','',fmt(B.apps),fmt(B.inst),f1(B.conv),'',fmt(B.apps-B.inst),f1(B.mw),f2(B.mw&&B.inst?B.mw*1000/B.inst:0),f2(B.cr),'']);
+  doc.autoTable({head,body,startY:doc.lastAutoTable.finalY+6,theme:'grid',rowPageBreak:'avoid',margin:{left:14,right:14,bottom:12,top:14},
+    styles:{fontSize:8,cellPadding:1.5,lineColor:C.line,lineWidth:.15,textColor:C.ink,halign:'right'},headStyles:{fillColor:C.head,textColor:C.muted,fontStyle:'bold',halign:'right'},
+    columnStyles:{0:{halign:'center',cellWidth:12},1:{halign:'left',cellWidth:42},2:{halign:'left',cellWidth:20},6:{halign:'left',cellWidth:24}},
+    didParseCell:d=>{ if(d.section==='head'&&[1,2,6].includes(d.column.index)) d.cell.styles.halign='left'; if(d.section!=='body') return; const row=body[d.row.index], last=d.row.index===body.length-1;
+      if(last){ d.cell.styles.fontStyle='bold'; d.cell.styles.fillColor=C.head; return; }
+      if(d.column.index===2){ d.cell.styles.textColor=row[2]==='SBPDCL'?[42,120,214]:[235,104,52]; d.cell.styles.fontStyle='bold'; }
+      if(d.column.index===6){ d.cell.styles.textColor=stCol(row[6]); d.cell.styles.fontStyle='bold'; } }});
+  doc.save(`PMSG_Bihar_Districts_${fileDate()}.pdf`);
 }
 
 const TILES={'jammu':[3,0,'JK'],'ladakh':[4,0,'LA'],'punjab':[3,1,'PB'],'himachal':[4,1,'HP'],'chandigarh':[2,1,'CH'],

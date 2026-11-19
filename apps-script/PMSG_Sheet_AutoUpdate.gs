@@ -33,6 +33,9 @@ const CFG = {
   SHEET_STATE: 'State-wise',
   SHEET_MONTH: 'Month-wise',
   SHEET_HISTORY: 'History',
+  SHEET_BIH_DIST: 'Bihar Districts',
+  SHEET_BIH_SUM: 'Bihar Summary',
+  SHEET_BIH_HIST: 'Bihar History',
   MIRROR_URL: 'https://solentra.in/data/pmsg-snapshot.json',   // daily copy of the portal (data file)
   TZ: 'Asia/Kolkata',
   RUN_HOURS: [9, 18],      // checks at 9 AM and 6 PM IST every day
@@ -79,7 +82,10 @@ function installDailyTrigger() {
 
 function dailyJob() {
   const last = Number(PropertiesService.getScriptProperties().getProperty('lastPortalPush') || 0);
-  if (Date.now() - last < 8 * 3600 * 1000) return;       // office PC sent official data recently
+  if (Date.now() - last < 8 * 3600 * 1000) {              // office PC sent official state data recently:
+    try { writeBihar_(fetchSnapshot_()); } catch (e) { Logger.log('Bihar update skipped: ' + e); }   // still refresh Bihar districts
+    return;
+  }
   try { updateFromMirror(); }
   catch (e) { Logger.log('Update skipped, last good figures kept: ' + e); }  // keep last good data
 }
@@ -146,16 +152,92 @@ function rememberUrl_() {
 
 /* ============================ SOURCE 2: DAILY COPY SITE ============================ */
 
-function updateFromMirror() {
+function fetchSnapshot_() {
   const res = UrlFetchApp.fetch(CFG.MIRROR_URL + '?t=' + Date.now(), { muteHttpExceptions: true, followRedirects: true });
   if (res.getResponseCode() !== 200) throw new Error('Copy site returned HTTP ' + res.getResponseCode());
-  const snap = JSON.parse(res.getContentText());
+  return JSON.parse(res.getContentText());
+}
+
+function updateFromMirror() {
+  const snap = fetchSnapshot_();
   const list = snapshotToList_(snap);
   if (list.length < 30) throw new Error('Copy site data looks incomplete (' + list.length + ' states).');
   const when = snap.capturedAt ? new Date(snap.capturedAt) : null;
   const n = writeState_(list, 'National Portal (pmsuryaghar.gov.in) via daily copy at solentra.in (unofficial)', when);
-  toast_('Updated ' + n + ' states.');
+  try { writeBihar_(snap); } catch (e) { Logger.log('Bihar tabs not updated: ' + e); }
+  toast_('Updated ' + n + ' states and Bihar districts.');
   return n;
+}
+
+/* ============================ BIHAR DISTRICTS / DISCOMS ============================ */
+const SBPDCL_DISTRICTS = ['arwal', 'aurangabad', 'banka', 'bhagalpur', 'bhojpur', 'buxar', 'gaya', 'jamui', 'jehanabad',
+  'kaimur', 'lakhisarai', 'munger', 'nalanda', 'nawada', 'patna', 'rohtas', 'sheikhpura'];   // all other districts: NBPDCL
+function discomOf_(district) { const d = String(district).toLowerCase(); return SBPDCL_DISTRICTS.some(k => d.indexOf(k) === 0) ? 'SBPDCL' : 'NBPDCL'; }
+const r1_ = v => Math.round(v * 10) / 10, r2_ = v => Math.round(v * 100) / 100;
+
+function writeBihar_(snap) {
+  const states = snap.states || [];
+  const st = states.find(x => /bihar/i.test(x.stateName));
+  if (!st || !(st.districts || []).length) return 0;
+  const nat = states.find(x => x.stateId === 'NT') || {};
+  const when = Utilities.formatDate(snap.capturedAt ? new Date(snap.capturedAt) : new Date(), CFG.TZ, 'dd-MMM-yyyy HH:mm') + ' IST';
+  const ss = SpreadsheetApp.getActive();
+
+  // previous day's district installations (for "added since last update")
+  const hs = ss.getSheetByName(CFG.SHEET_BIH_HIST) || (() => { const x = ss.insertSheet(CFG.SHEET_BIH_HIST);
+    x.appendRow(['Date', 'District', 'DISCOM', 'Applications', 'Installations']); x.setFrozenRows(1);
+    x.getRange(1, 1, 1, 5).setFontWeight('bold').setBackground('#e8f1ec'); return x; })();
+  const t = today_(), prev = {};
+  const last = hs.getLastRow();
+  if (last >= 2) {
+    const v = hs.getRange(2, 1, last - 1, 5).getDisplayValues();
+    const days = v.map(r => r[0]).filter(d => d && d < t).sort();
+    const pd = days[days.length - 1];
+    v.forEach(r => { if (r[0] === pd) prev[r[1].toLowerCase()] = num_(r[4]); });
+    for (let i = v.length - 1; i >= 0; i--) if (v[i][0] === t) hs.deleteRow(i + 2);
+  }
+
+  const ds = st.districts.map(d => {
+    const name = titleCase_(d.name), apps = Number(d.applications) || 0, inst = Number(d.installations) || 0;
+    const mw = r2_((Number(d.capacityKW) || 0) / 1000), cr = r2_((Number(d.subsidy) || 0) / 1e7);
+    const p = prev[name.toLowerCase()];
+    return { name, discom: discomOf_(name), apps, inst, mw, cr, add: p !== undefined && p !== null ? inst - p : '' };
+  }).sort((a, b) => b.inst - a.inst);
+
+  // Bihar Districts tab
+  const sh = ss.getSheetByName(CFG.SHEET_BIH_DIST) || ss.insertSheet(CFG.SHEET_BIH_DIST);
+  const head = ['Rank', 'District', 'DISCOM', 'Applications', 'Installations', 'Installed %', 'Capacity (MW)', 'Avg System (kW)', 'Subsidy (Rs Cr)', 'Installations added since last update'];
+  const body = ds.map((d, i) => [i + 1, d.name, d.discom, d.apps, d.inst, d.apps ? r1_(d.inst / d.apps * 100) : '', d.mw, d.inst ? r2_(d.mw * 1000 / d.inst) : '', d.cr, d.add]);
+  sh.clear();
+  sh.getRange(1, 1, body.length + 1, head.length).setValues([head].concat(body));
+  sh.setFrozenRows(1);
+  sh.getRange(1, 1, 1, head.length).setFontWeight('bold').setBackground('#e8f1ec').setWrap(true);
+  sh.getRange(2, 4, body.length, 2).setNumberFormat('#,##0');
+  sh.getRange(1, 12, 2, 2).setValues([['Last updated', when], ['Source', 'National Portal via daily copy at solentra.in (unofficial)']]);
+  sh.getRange(1, 12, 2, 1).setFontWeight('bold');
+
+  // Bihar Summary tab (DISCOMs, Bihar, India)
+  const disc = k => (st.discoms || []).find(x => new RegExp(k, 'i').test(x.name)) || {};
+  const row = (name, o, month, vendors) => [name, Number(o.applications) || 0, Number(o.installations) || 0, Number(o.households) || 0,
+    r2_((Number(o.capacityKW) || 0) / 1000), r2_((Number(o.subsidy != null ? o.subsidy : o.subsidyAmount) || 0) / 1e7),
+    month ? Number(month.applications) || 0 : '', month ? Number(month.installations) || 0 : '', vendors != null ? vendors : ''];
+  const sum = [['Name', 'Applications', 'Installations', 'Households', 'Capacity (MW)', 'Subsidy (Rs Cr)', 'Applications this month', 'Installations this month', 'Vendors'],
+    row('NBPDCL', disc('north')), row('SBPDCL', disc('south')),
+    row('Bihar', st, st.monthAdds, st.vendorCount), row('India', nat, nat.monthAdds, '')];
+  const sm = ss.getSheetByName(CFG.SHEET_BIH_SUM) || ss.insertSheet(CFG.SHEET_BIH_SUM);
+  sm.clear();
+  sm.getRange(1, 1, sum.length, sum[0].length).setValues(sum);
+  sm.setFrozenRows(1);
+  sm.getRange(1, 1, 1, sum[0].length).setFontWeight('bold').setBackground('#e8f1ec').setWrap(true);
+  sm.getRange(1, 12, 2, 2).setValues([['Last updated', when], ['Month', String(snap.month || '')]]);
+  sm.getRange(1, 12, 2, 1).setFontWeight('bold');
+
+  // history
+  const hr = ds.map(d => [t, d.name, d.discom, d.apps, d.inst]);
+  const start = hs.getLastRow() + 1;
+  hs.getRange(start, 1, hr.length, 1).setNumberFormat('@');
+  hs.getRange(start, 1, hr.length, 5).setValues(hr);
+  return ds.length;
 }
 
 /** snapshot JSON → [{state, apps, inst, mw, cr}]; skips the national row (stateId "NT") */
